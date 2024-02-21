@@ -1,0 +1,348 @@
+import styled from "styled-components";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Tick, Play } from "../based/Icon";
+const course_detail = {
+  title: "Kiến Thức Nhập Môn IT",
+  sub_title:
+    "Để có cái nhìn tổng quan về ngành IT - Lập trình web các bạn nên xem các videos tại khóa này trước nhé.",
+  experience: [
+    "Có cái nhìn tổng quan về ngành IT - Lập trình web",
+    "Có kiến thức cơ bản về ngôn ngữ lập trình",
+    "Các khái niệm, thuật ngữ cốt lõi khi triển khai ứng dụng",
+    "Hiểu hơn về cách internet và máy vi tính hoạt động",
+  ],
+  chapters: 4,
+  lessons: 20,
+  time: "03 giờ 26 phút",
+};
+
+const details_lessons = [
+  {
+    id: 1,
+    title: "1. Giới thiệu khóa học",
+    lessons: [
+      {
+        id: 1,
+        title: "1. Mô hình Client - Server là gì?",
+        time: "11:35",
+      },
+      {
+        id: 2,
+        title: "2. Các ngôn ngữ lập trình phổ biến",
+        time: "10:35",
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: "2. Môi trường, con người IT",
+    lessons: [
+      {
+        id: 1,
+        title: "3.Mô hình Client - Server là gì?",
+        time: "11:35",
+      },
+      {
+        id: 2,
+        title: "4. Các ngôn ngữ lập trình phổ biến",
+        time: "10:35",
+      },
+    ],
+  },
+];
+
+const DetailCourse = () => {
+  const { id } = useParams();
+  const [course, setCourse] = useState({});
+  //   useEffect(() => {
+  //     fetch(`http://localhost:3000/courses/${id}`)
+  //       .then((res) => res.json())
+  //       .then((data) => setCourse(data));
+  //   }, [id]);
+  return (
+    <DetailCourseWrapper>
+      <DetailCourseInner>
+        <DCLeft>
+          <Header>
+            <TitleHeader>{course_detail.title}</TitleHeader>
+            <SubHeader>
+              <SubHeaderTitle>
+                Để có cái nhìn tổng quan về ngành IT - Lập trình web các bạn nên
+                xem các videos tại khóa này trước nhé.
+              </SubHeaderTitle>
+            </SubHeader>
+            <Experience>
+              <ContentTitle>Bạn sẽ học được gì</ContentTitle>
+              <EWrapper>
+                {course_detail.experience.map((e, i) => (
+                  <ELi key={i}>
+                    <TickWrapper>
+                      <Tick active={true} />
+                    </TickWrapper>
+                    <ETitle>{e}</ETitle>
+                  </ELi>
+                ))}
+              </EWrapper>
+            </Experience>
+          </Header>
+          <Body>
+            <ContentTitle>Nội dung khóa học</ContentTitle>
+            <SubTitle>
+              <LeftContent>
+                <Item>
+                  <ItemTitle>{course_detail.chapters}</ItemTitle>
+                  <SubItemTitle>chương</SubItemTitle>
+                  <span>•</span>
+                </Item>
+                <Item>
+                  <ItemTitle>{course_detail.lessons}</ItemTitle>
+                  <SubItemTitle>bài học</SubItemTitle>
+                  <span>•</span>
+                </Item>
+                <Item>
+                  <SubItemTitle>Thời lượng</SubItemTitle>
+                  <ItemTitle>{course_detail.time}</ItemTitle>
+                  <span>•</span>
+                </Item>
+              </LeftContent>
+              <RightContent>
+                <RTitle>Mở rộng tất cả</RTitle>
+              </RightContent>
+            </SubTitle>
+
+            <Content>
+              {details_lessons.map((d, i) => (
+                <>
+                  <LessonWrapper>
+                    <HeaderContent>
+                      <ContentIL>
+                        <IconL>-</IconL>
+                      </ContentIL>
+                      <ContentIR>
+                        <TitleR>{d.title}</TitleR>
+                      </ContentIR>
+                    </HeaderContent>
+                    <ContentUl>
+                      {d.lessons.map((l, i) => (
+                        <ContentLi key={i}>
+                          <ItemLiLeft>
+                            <IconPlayWrapper>
+                              {" "}
+                              <Play active={true} />
+                            </IconPlayWrapper>
+                            <TitleLi>{l.title}</TitleLi>
+                          </ItemLiLeft>
+                          <ItemLiRight>{l.time}</ItemLiRight>
+                        </ContentLi>
+                      ))}
+                    </ContentUl>
+                  </LessonWrapper>
+                </>
+              ))}
+            </Content>
+          </Body>
+        </DCLeft>
+        <DCRight>
+          <DCRightCourse></DCRightCourse>
+          <DCRContent>
+            <DCRTitle>Miễn phí</DCRTitle>
+            <Link to="/lesson/1">
+              {" "}
+              <DCRButton>Đăng kí khóa học</DCRButton>
+            </Link>
+          </DCRContent>
+        </DCRight>
+      </DetailCourseInner>
+    </DetailCourseWrapper>
+  );
+};
+export default DetailCourse;
+
+const DetailCourseWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+const DetailCourseInner = styled.div`
+  width: 90%;
+  margin-top: 20px;
+  display: flex;
+  margin: 0 auto;
+`;
+const ImgCourse = styled.img``;
+const Title = styled.h3``;
+const Price = styled.div``;
+const SalePrice = styled.span``;
+
+const Header = styled.div``;
+
+const TitleHeader = styled.h1`
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 16px;
+
+  min-height: 33px;
+`;
+
+const SubHeader = styled.div`
+  margin-top: 20px;
+`;
+
+const SubHeaderTitle = styled.h3``;
+
+const Experience = styled.div`
+  margin-top: 20px;
+`;
+
+const EWrapper = styled.ul`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+`;
+
+const ETitle = styled.div``;
+const ELi = styled.li`
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  width: 45%;
+`;
+const TickWrapper = styled.div`
+  width: 14px;
+  display: flex;
+  margin-right: 10px;
+  align-items: center;
+`;
+const ContentTitle = styled.h1`
+  font-size: 18px;
+  margin-bottom: 12px;
+  margin-top: 10px;
+`;
+
+const Body = styled.div``;
+
+const SubTitle = styled.div`
+  display: flex;
+  margin-top: 20px;
+`;
+
+const LeftContent = styled.div`
+  display: flex;
+  width: 50%;
+  justify-content: space-between;
+`;
+
+const RightContent = styled.div`
+  width: 50%;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const Item = styled.div`
+  display: flex;
+`;
+
+const ItemTitle = styled.p`
+  margin-right: 5px;
+  font-weight: 700;
+`;
+const SubItemTitle = styled.span`
+  margin-right: 5px;
+`;
+
+const RTitle = styled.h3`
+  margin-right: 20px;
+`;
+
+const Content = styled.div``;
+
+const HeaderContent = styled.div`
+  display: flex;
+  background: #f5f5f5;
+  border: 1px solid #ebebeb;
+  border-radius: 6px;
+  padding: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 147px;
+  z-index: 1;
+  padding: 12px 0px;
+`;
+
+const ContentUl = styled.ul``;
+const ContentLi = styled.li`
+  padding: 12px 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 3%;
+`;
+
+const ContentIL = styled.div`
+  margin-right: 10px;
+`;
+const IconL = styled.div``;
+
+const ContentIR = styled.div``;
+
+const TitleR = styled.h3``;
+
+const LessonWrapper = styled.div`
+  margin-bottom: 8px;
+`;
+
+const TitleLi = styled.h3``;
+const IconPlayWrapper = styled.div`
+  width: 15px;
+  display: flex;
+  margin-right: 10px;
+  align-items: center;
+`;
+
+const ItemLiLeft = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ItemLiRight = styled.h3``;
+
+const DCLeft = styled.div`
+  width: 70%;
+`;
+
+const DCRight = styled.div`
+  width: 30%;
+  height: 100%;
+  margin-top: 20px;
+`;
+
+const DCRightCourse = styled.div`
+  background-image: url("https://files.fullstack.edu.vn/f8-prod/courses/21/63e1bcbaed1dd.png");
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  padding-top: 56.25%;
+  width: 100%;
+`;
+
+const DCRContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const DCRTitle = styled.h3``;
+
+const DCRButton = styled.button`
+  font-size: 16px;
+  margin-top: 16px;
+  min-width: 180px;
+  padding: 10px 16px;
+  background-color: #f05123;
+  border: none;
+  color: #fff;
+  border-radius: 999px;
+`;
