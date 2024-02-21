@@ -13,7 +13,7 @@ class LessonController:
         try:
             stmt = select(Lesson).where(Lesson.uuid == uuid_to_bin(uuid))
             lesson = db.session.execute(stmt).first()
-        except StatementError:
+        except (StatementError, ValueError):
             stmt = select(Lesson).where(Lesson.id == int(uuid))
             lesson = db.session.execute(stmt).first()
         if lesson is None:
