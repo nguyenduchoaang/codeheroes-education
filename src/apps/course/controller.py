@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 
 from src import db
 from src.models import Course
@@ -23,14 +23,39 @@ class CourseController:
     @staticmethod
     def create():
         data = request.get_json()
-        name = data.get("name", None)
-        price = data.get("price", None)
+        name = data.get("name", "")
+        price = data.get("price", 0)
         description = data.get("description", None)
 
         course = Course(name=name, price=price, description=description)
         db.session.add(course)
         db.session.commit()
         return jsonify({"message": "Create course successfully"})
+
+    @staticmethod
+    def update_partial(id: int):
+        data = request.get_json()
+
+        stmt = update(Course).where(Course.id == id).values(**data)
+        db.session.execute(stmt)
+        db.session.commit()
+        return jsonify({"message": "Update course successfully"})
+
+    @staticmethod
+    def update_all(id: int):
+        data = request.get_json()
+        name = data.get("name", None)
+        price = data.get("price", None)
+        description = data.get("description", None)
+
+        stmt = update(Course).where(Course.id == id).values(
+            name=name,
+            price=price,
+            description=description
+        )
+        db.session.execute(stmt)
+        db.session.commit()
+        return jsonify({"message": "Update course successfully"})
 
     @staticmethod
     def delete(id: int):
