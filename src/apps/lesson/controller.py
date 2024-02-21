@@ -34,7 +34,7 @@ class LessonController:
         author_id = data.get("author_id", None)
 
         lesson = Lesson(
-            uuid=uuid.uuid4(),
+            uuid=uuid.uuid4().bytes,
             video_url=video_url,
             title=title,
             duration=duration,
@@ -45,7 +45,7 @@ class LessonController:
         )
         db.session.add(lesson)
         db.session.commit()
-        return jsonify({"message": "Create Chapter successfully"})
+        return jsonify({"message": "Create Lesson successfully"})
 
     @staticmethod
     def delete(uuid: int):
@@ -53,5 +53,4 @@ class LessonController:
         db.session.execute(stmt)
         db.session.commit()
         return jsonify({"message": "Delete Chapter successfully"})
-
 
