@@ -1,3 +1,6 @@
+import uuid
+from datetime import datetime
+
 from flask import jsonify, request
 from sqlalchemy import delete, select
 from sqlalchemy.exc import StatementError
@@ -23,11 +26,24 @@ class LessonController:
     @staticmethod
     def create():
         data = request.get_json()
-        name = data.get("name", None)
-        course_id = data.get("course_id", None)
+        video_url = data.get("video_url", None)
+        title = data.get("title", "")
+        duration = data.get("duration", 60)
+        content = data.get("content", "")
+        chapter_id = data.get("chapter_id", None)
+        author_id = data.get("author_id", None)
 
-        chapter = Lesson(name=name, course_id=course_id)
-        db.session.add(chapter)
+        lesson = Lesson(
+            uuid=uuid.uuid4(),
+            video_url=video_url,
+            title=title,
+            duration=duration,
+            content=content,
+            create_time=datetime.now(),
+            chapter_id=chapter_id,
+            author_id=author_id
+        )
+        db.session.add(lesson)
         db.session.commit()
         return jsonify({"message": "Create Chapter successfully"})
 
