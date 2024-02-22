@@ -9,4 +9,3 @@ ChapterRouter.route("/<int:id>/", methods=["GET"])(ChapterController.one)
 ChapterRouter.route("/<int:id>/", methods=["PUT"])(ChapterController.update_all)
 ChapterRouter.route("/<int:id>/", methods=["PATCH"])(ChapterController.update_partial)
 ChapterRouter.route("/<int:id>/", methods=["DELETE"])(ChapterController.delete)
-
