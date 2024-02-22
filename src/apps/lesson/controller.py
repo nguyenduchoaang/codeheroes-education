@@ -2,25 +2,34 @@ import uuid
 from datetime import datetime
 
 from flask import jsonify, request
-from sqlalchemy import delete, select
-from sqlalchemy.exc import StatementError
+from sqlalchemy import delete, select, update
 
 from src import db
 from src.models import Lesson
-from src.utils.uuid import uuid_to_bin
+from src.utils.uuid import uuid_to_bin, is_valid_uuid
 
 
 class LessonController:
     @staticmethod
+    def __add_conditional_statement(stmt, uuid: str):
+        if len(uuid) == 36 and is_valid_uuid(uuid):
+            return stmt.where(Lesson.uuid == uuid_to_bin(uuid))
+        try:
+            id = int(uuid) 
+        except ValueError:
+            raise ValueError
+        return stmt.where(Lesson.id == id)
+
+    @staticmethod
     def one(uuid: str):
         try:
-            stmt = select(Lesson).where(Lesson.uuid == uuid_to_bin(uuid))
-            lesson = db.session.execute(stmt).first()
-        except (StatementError, ValueError):
-            stmt = select(Lesson).where(Lesson.id == int(uuid))
-            lesson = db.session.execute(stmt).first()
+            stmt = LessonController.__add_conditional_statement(select(Lesson), uuid)
+        except ValueError:
+            return jsonify({"message": "Lesson ID is invalid"})
+
+        lesson = db.session.execute(stmt).first()
         if lesson is None:
-            return jsonify({"message": "Lesson UUID not exist"})
+            return jsonify({"message": "Lesson ID not exist"})
         return jsonify(lesson[0].as_dict())
 
     @staticmethod
@@ -45,12 +54,57 @@ class LessonController:
         )
         db.session.add(lesson)
         db.session.commit()
-        return jsonify({"message": "Create Lesson successfully"})
+        return jsonify({"message": "Create Lesson successfully"}), 201
 
     @staticmethod
-    def delete(uuid: int):
-        stmt = delete(Lesson).where(Lesson.uuid == uuid)
+    def update_partial(uuid: str):
+        try:
+            stmt = LessonController.__add_conditional_statement(update(Lesson), uuid)
+        except ValueError:
+            return jsonify({"message": "Lesson ID is invalid"})
+
+        data = request.get_json()
+        stmt = stmt.values(**data)
         db.session.execute(stmt)
         db.session.commit()
-        return jsonify({"message": "Delete Chapter successfully"})
+        return jsonify({"message": "Update Lesson successfully"}), 200
+
+    @staticmethod
+    def update_all(uuid: str):
+        try:
+            stmt = LessonController.__add_conditional_statement(update(Lesson), uuid)
+        except ValueError:
+            return jsonify({"message": "Lesson ID is invalid"})
+
+        data = request.get_json()
+        title = data.get("title", "")
+        video_url = data.get("video_url", None)
+        duration = data.get("duration", None)
+        content = data.get("content", "")
+        chapter_id = data.get("chapter_id", None)
+
+        if chapter_id is None:
+            return jsonify({"message": "Update failed. Field `chapter_id` is invalid."})
+
+        stmt = stmt.values(
+            title=title,
+            video_url=video_url,
+            duration=duration,
+            content=content,
+            chapter_id=chapter_id
+        )
+        db.session.execute(stmt)
+        db.session.commit()
+        return jsonify({"message": "Update Lesson successfully"}), 200
+
+    @staticmethod
+    def delete(uuid: str):
+        try:
+            stmt = LessonController.__add_conditional_statement(delete(Lesson), uuid)
+        except ValueError:
+            return jsonify({"message": "Lesson ID is invalid"})
+
+        db.session.execute(stmt)
+        db.session.commit()
+        return jsonify({"message": "Delete Chapter successfully"}), 200
 
