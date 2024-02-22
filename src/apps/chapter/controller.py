@@ -11,8 +11,8 @@ class ChapterController:
         stmt = select(Chapter).where(Chapter.id == id)
         chapter = db.session.execute(stmt).first()
         if chapter is None:
-            return jsonify({"message": "Chapter ID not exist"})
-        return jsonify(chapter[0].as_dict("lessons"))
+            return jsonify({"message": "Chapter ID not exist"}), 404
+        return jsonify(chapter[0].as_dict("lessons")), 200
 
     @staticmethod
     def create():
@@ -23,7 +23,7 @@ class ChapterController:
         chapter = Chapter(name=name, course_id=course_id)
         db.session.add(chapter)
         db.session.commit()
-        return jsonify({"message": "Create Chapter successfully"})
+        return jsonify({"message": "Create Chapter successfully"}), 201
 
     @staticmethod
     def update_partial(id: int):
@@ -32,7 +32,7 @@ class ChapterController:
         stmt = update(Chapter).where(Chapter.id == id).values(**data)
         db.session.execute(stmt)
         db.session.commit()
-        return jsonify({"message": "Update Chapter successfully"})
+        return jsonify({"message": "Update Chapter successfully"}), 200
 
     @staticmethod
     def update_all(id: int):
@@ -49,12 +49,11 @@ class ChapterController:
         )
         db.session.execute(stmt)
         db.session.commit()
-        return jsonify({"message": "Update Chapter successfully"})
+        return jsonify({"message": "Update Chapter successfully"}), 200
 
     @staticmethod
     def delete(id: int):
         stmt = delete(Chapter).where(Chapter.id == id)
         db.session.execute(stmt)
         db.session.commit()
-        return jsonify({"message": "Delete Chapter successfully"})
-
+        return jsonify({"message": "Delete Chapter successfully"}), 200

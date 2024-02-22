@@ -10,15 +10,15 @@ class CourseController:
     def all():
         stmt = select(Course)
         rows = db.session.execute(stmt).all()
-        return jsonify([course[0].as_dict() for course in rows])
+        return jsonify([course[0].as_dict() for course in rows]), 200
 
     @staticmethod
     def one(id: int):
         stmt = select(Course).where(Course.id == id)
         course = db.session.execute(stmt).first()
         if course is None:
-            return jsonify({"message": "Course ID not exist"})
-        return jsonify(course[0].as_dict("chapters"))
+            return jsonify({"message": "Course ID not exist"}), 404
+        return jsonify(course[0].as_dict("chapters")), 200
 
     @staticmethod
     def create():
@@ -30,7 +30,7 @@ class CourseController:
         course = Course(name=name, price=price, description=description)
         db.session.add(course)
         db.session.commit()
-        return jsonify({"message": "Create course successfully"})
+        return jsonify({"message": "Create course successfully"}), 201
 
     @staticmethod
     def update_partial(id: int):
@@ -39,7 +39,7 @@ class CourseController:
         stmt = update(Course).where(Course.id == id).values(**data)
         db.session.execute(stmt)
         db.session.commit()
-        return jsonify({"message": "Update course successfully"})
+        return jsonify({"message": "Update course successfully"}), 200
 
     @staticmethod
     def update_all(id: int):
@@ -55,11 +55,11 @@ class CourseController:
         )
         db.session.execute(stmt)
         db.session.commit()
-        return jsonify({"message": "Update course successfully"})
+        return jsonify({"message": "Update course successfully"}), 200
 
     @staticmethod
     def delete(id: int):
         stmt = delete(Course).where(Course.id == id)
         db.session.execute(stmt)
         db.session.commit()
-        return jsonify({"message": "Delete course successfully"})
+        return jsonify({"message": "Delete course successfully"}), 200
