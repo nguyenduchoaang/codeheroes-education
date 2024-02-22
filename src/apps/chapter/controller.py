@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 
 from src import db
 from src.models import Chapter
@@ -24,6 +24,32 @@ class ChapterController:
         db.session.add(chapter)
         db.session.commit()
         return jsonify({"message": "Create Chapter successfully"})
+
+    @staticmethod
+    def update_partial(id: int):
+        data = request.get_json()
+
+        stmt = update(Chapter).where(Chapter.id == id).values(**data)
+        db.session.execute(stmt)
+        db.session.commit()
+        return jsonify({"message": "Update Chapter successfully"})
+
+    @staticmethod
+    def update_all(id: int):
+        data = request.get_json()
+        name = data.get("name", "")
+        course_id = data.get("course_id", None)
+
+        if course_id is None:
+            return jsonify({"message": "Update failed. Field `course_id` is invalid."})
+
+        stmt = update(Chapter).where(Chapter.id == id).values(
+            name=name,
+            course_id=course_id
+        )
+        db.session.execute(stmt)
+        db.session.commit()
+        return jsonify({"message": "Update Chapter successfully"})
 
     @staticmethod
     def delete(id: int):
