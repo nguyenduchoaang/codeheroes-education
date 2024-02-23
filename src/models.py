@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import Any, List, Optional
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Table, BINARY, text
+from sqlalchemy import Column, ForeignKey, String, Table, BINARY, MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import Text
 
@@ -26,23 +26,29 @@ class BaseModel(DeclarativeBase):
         pass
 
 
-Enrollment = Table(
-    "user_enroll_course",
-    BaseModel.metadata,
-    Column("user_id", ForeignKey("user.id"), primary_key=True),
-    Column("course_id", ForeignKey("course.id"), primary_key=True),
-    Column("start_date", DateTime, nullable=False, default=datetime.now()),
-    Column("finish_date", DateTime),
-    Column("score", Integer)
-)
+class Enrollment(BaseModel):
+    __tablename__ = "enrollment"
 
-Progress = Table(
-    "progress",
-    BaseModel.metadata,
-    Column("user_id", ForeignKey("user.id"), primary_key=True),
-    Column("lesson_id", ForeignKey("lesson.id"), primary_key=True),
-    Column("completed", Boolean, nullable=False, default=False)
-)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("course.id"), primary_key=True)
+    start_date: Mapped[datetime]
+    finish_date: Mapped[Optional[datetime]]
+    score: Mapped[Optional[int]]
+
+    user: Mapped["User"] = relationship(back_populates="courses")
+    course: Mapped["Course"] = relationship(back_populates="users")
+
+
+class Progress(BaseModel):
+    __tablename__ = "progress"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id"), primary_key=True)
+    completed: Mapped[bool] = mapped_column(default=False)
+
+    user: Mapped["User"] = relationship(back_populates="lessons")
+    lesson: Mapped["Lesson"] = relationship(back_populates="users")
+
 
 Reaction = Table(
     "reaction",
@@ -77,8 +83,8 @@ class User(BaseModel):
     phone = Column(String(20))
     role: Mapped[UserRole] = mapped_column(default=UserRole.USER)
 
-    courses: Mapped[List["Course"]] = relationship("Course", secondary=Enrollment, back_populates="users")
-    lessons: Mapped[List["Lesson"]] = relationship("Lesson", secondary=Progress, back_populates="users")
+    courses: Mapped[List[Enrollment]] = relationship(back_populates="user")
+    lessons: Mapped[List[Progress]] = relationship(back_populates="user")
     comments: Mapped[List["Comment"]] = relationship("Comment", secondary=Reaction, back_populates="user_reactions")
 
     def __repr__(self) -> str:
@@ -142,7 +148,7 @@ class Lesson(BaseModel):
     chapter_id: Mapped[int] = mapped_column(ForeignKey("chapter.id"))
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
-    users: Mapped[List[User]] = relationship(secondary=Progress, back_populates="lessons")
+    users: Mapped[List[Progress]] = relationship(back_populates="lesson")
     questions: Mapped[List[Question]] = relationship(Question, backref="lesson")
 
     def __repr__(self) -> str:
@@ -196,7 +202,7 @@ class Course(BaseModel):
     description = mapped_column(Text)
 
     chapters: Mapped[List[Chapter]] = relationship(Chapter, backref="course")
-    users: Mapped[List[User]] = relationship(secondary=Enrollment, back_populates="courses")
+    users: Mapped[List[Enrollment]] = relationship(back_populates="course")
 
     def __repr__(self) -> str:
         return f"Course(id={self.id}, name={self.name})"
@@ -218,21 +224,15 @@ class Course(BaseModel):
 
 if __name__ == "__main__":
     with app.app_context():
-        # Create all
-        conn = db.engine.connect()
-        for table in reversed(BaseModel.metadata.sorted_tables):
-            stmt = text(f"ALTER TABLE {str(table)} AUTO_INCREMENT = 1")
-            conn.execute(stmt)
-            conn.commit()
-            conn.execute(table.delete())
-        conn.commit()
-        conn.close()
         print("Drop all")
-        db.drop_all()
-        print("create all")
+        m = MetaData()
+        m.reflect(db.engine)
+        m.drop_all(db.engine)
+
+        print("Create all")
         BaseModel.metadata.create_all(bind=db.engine)
 
-        print("importing data")
+        print("Importing data")
         from .import_data import import_data
         import_data(db)
 
