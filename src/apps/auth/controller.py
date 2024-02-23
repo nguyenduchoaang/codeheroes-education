@@ -40,7 +40,7 @@ class AuthController:
             return jsonify({"message": "Bad username or password"}), 401
 
         access_token = create_access_token(identity=user[0].username)
-        return jsonify(access_token)
+        return jsonify(access_token=access_token)
 
     @staticmethod
     def logout():
