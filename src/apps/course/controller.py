@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from flask import jsonify, request
 from sqlalchemy import select, delete, update
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from src import db
-from src.models import Course
+from src.models import Course, Enrollment, User
 
 
 class CourseController:
@@ -63,3 +66,32 @@ class CourseController:
         db.session.execute(stmt)
         db.session.commit()
         return jsonify({"message": "Delete course successfully"}), 200
+
+    @staticmethod
+    @jwt_required()
+    def enroll(id: int):
+        # Get course
+        stmt = select(Course).where(Course.id == id)
+        course = db.session.execute(stmt).first()
+
+        if course is None:
+            return jsonify(msg="Course ID not exist"), 404
+
+        # Get user
+        username = get_jwt_identity()
+        stmt = select(User).where(User.username == username)
+        user = db.session.execute(stmt).first()
+
+        if user is None:
+            return jsonify(msg="Invalid user"), 401
+
+        for enrollment in user[0].courses:
+            if enrollment.course.id == id:
+                return jsonify(msg="Course was enrolled")
+
+        enrollment = Enrollment(start_date=datetime.now())
+        enrollment.course = course[0]
+        user[0].courses.append(enrollment)
+        db.session.commit()
+
+        return jsonify(msg="Enroll course successfully"), 200
