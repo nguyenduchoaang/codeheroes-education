@@ -32,16 +32,16 @@ COURSES = [
 ]
 
 CHAPTERS = [
-    { "name": "Giới thiệu", "course_id": 1 },
-    { "name": "Ôn lại ES6+", "course_id": 1 },
-    { "name": "React, ReactDOM", "course_id": 1 },
-    { "name": "JSX, Components, Props", "course_id": 1 },
-    { "name": "Giới thiệu", "course_id": 2 },
-    { "name": "Windows Terminal & WSL", "course_id": 2 },
-    { "name": "Các lệnh Linux cơ bản", "course_id": 2 },
-    { "name": "Chạy dự án React, Node, Laravel", "course_id": 2 },
-    { "name": "Deploy dự án với Server thật", "course_id": 2 },
-    { "name": "Hoàn thành khóa học", "course_id": 2 }
+    { "name": "Giới thiệu", "order": 1, "course_id": 1 },
+    { "name": "Ôn lại ES6+", "order": 2, "course_id": 1 },
+    { "name": "React, ReactDOM", "order": 3, "course_id": 1 },
+    { "name": "JSX, Components, Props", "order": 4, "course_id": 1 },
+    { "name": "Giới thiệu", "order": 1, "course_id": 2 },
+    { "name": "Windows Terminal & WSL", "order": 2, "course_id": 2 },
+    { "name": "Các lệnh Linux cơ bản", "order": 3, "course_id": 2 },
+    { "name": "Chạy dự án React, Node, Laravel", "order": 4, "course_id": 2 },
+    { "name": "Deploy dự án với Server thật", "order": 5, "course_id": 2 },
+    { "name": "Hoàn thành khóa học", "order": 6, "course_id": 2 }
 ]
 
 LESSONS = [
@@ -50,8 +50,8 @@ LESSONS = [
         "title": "ReactJS là gì? Tại sao nên học ReactJS?",
         "duration": 641,
         "content": "",
+        "order": 1,
         "chapter_id": 1,
-        "author_id": 1,
         "create_time": datetime.now()
     },
     {
@@ -59,8 +59,8 @@ LESSONS = [
         "title": "SPA/MPA là gì?",
         "duration": 1340,
         "content": "",
+        "order": 2,
         "chapter_id": 1,
-        "author_id": 1,
         "create_time": datetime.now()
     }
 ]

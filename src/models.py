@@ -7,6 +7,7 @@ from typing import Any, List, Optional
 from sqlalchemy import Column, ForeignKey, String, Table, BINARY, MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import Text
+from sqlalchemy.ext.orderinglist import ordering_list
 
 from . import app, db
 
@@ -84,6 +85,54 @@ Reaction = Table(
 )
 
 
+BlogTag = Table(
+    "blog_tag",
+    Base.metadata,
+    Column("blog_id", ForeignKey("blog.id"), primary_key=True),
+    Column("tag_id", ForeignKey("tag.id"), primary_key=True)
+)
+
+CourseTag = Table(
+    "course_tag",
+    Base.metadata,
+    Column("course_id", ForeignKey("course.id"), primary_key=True),
+    Column("tag_id", ForeignKey("tag.id"), primary_key=True)
+)
+
+
+class Tag(BaseModel):
+    __tablename__ = "tag"
+
+    name: Mapped[str] = mapped_column(String(50))
+
+    blogs: Mapped[List["Blog"]] = relationship(secondary=BlogTag, back_populates="tags")
+    courses: Mapped[List["Course"]] = relationship(secondary=CourseTag, back_populates="tags")
+
+    def __repr__(self) -> str:
+        return f"Tag(id={self.id}, name={self.name})"
+
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+
+
+class Blog(PostModel):
+    __tablename__ = "blog"
+
+    author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+
+    tags: Mapped[List[Tag]] = relationship(secondary=BlogTag, back_populates="blogs")
+
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        return {
+            **super().as_dict(*attrs),
+            "author_id": self.author_id,
+            "tags": self.tags
+        }
+
+
 class Comment(BaseModel):
     __tablename__ = "comment"
 
@@ -109,6 +158,7 @@ class User(BaseModel):
     phone = Column(String(20))
     role: Mapped[UserRole] = mapped_column(default=UserRole.USER)
 
+    blogs: Mapped[List[Blog]] = relationship(backref="user")
     courses: Mapped[List[Enrollment]] = relationship(back_populates="user")
     lessons: Mapped[List[Progress]] = relationship(back_populates="user")
     comments: Mapped[List[Comment]] = relationship(secondary=Reaction, back_populates="user_reactions")
@@ -164,9 +214,9 @@ class Question(BaseModel):
 class Lesson(PostModel):
     __tablename__ = "lesson"
 
-    uuid = Column(BINARY(16), index=True, unique=True, default=uuid.uuid4().bytes)
+    uuid: Mapped[bytes] = mapped_column(BINARY(16), index=True, unique=True)
+    order: Mapped[int]
     chapter_id: Mapped[int] = mapped_column(ForeignKey("chapter.id", ondelete="CASCADE"))
-    author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
     users: Mapped[List[Progress]] = relationship(back_populates="lesson")
     questions: Mapped[List[Question]] = relationship(backref="lesson", cascade="all, delete")
@@ -179,7 +229,6 @@ class Lesson(PostModel):
             **super().as_dict(*attrs),
             "uuid": uuid.UUID(bytes=self.uuid),
             "chapter_id": self.chapter_id,
-            "author_id": self.author_id,
             "questions": [question.as_dict() for question in self.questions]
         }
         return data
@@ -189,9 +238,12 @@ class Chapter(BaseModel):
     __tablename__ = "chapter"
 
     name: Mapped[str] = mapped_column(String(255))
+    order: Mapped[int]
     course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"))
 
-    lessons: Mapped[List[Lesson]] = relationship(backref="chapter", cascade="all, delete")
+    lessons: Mapped[List[Lesson]] = relationship(backref="chapter", cascade="all, delete",
+                                                 collection_class=ordering_list("order"),
+                                                 order_by=Lesson.order)
 
     def __repr__(self) -> str:
         return f"Chapter(id={self.id}, name={self.name})"
@@ -199,13 +251,14 @@ class Chapter(BaseModel):
     def as_dict(self, *attrs) -> dict[str, Any]:
         data = {
             "id": self.id,
-            "name": self.name,
-            "course_id": self.course_id
+            "name": self.name
         }
         for attr in attrs:
             match attr:
                 case "lessons":
                     data["lessons"] = [lesson.as_dict() for lesson in self.lessons]
+                case "course_id":
+                    data["course_id"] = self.course_id
         return data
 
 
@@ -216,8 +269,11 @@ class Course(BaseModel):
     price: Mapped[int] = mapped_column(default=0)
     description = mapped_column(Text)
 
-    chapters: Mapped[List[Chapter]] = relationship(backref="course", cascade="all, delete")
+    chapters: Mapped[List[Chapter]] = relationship(backref="course", cascade="all, delete",
+                                                   collection_class=ordering_list("order"),
+                                                   order_by=Chapter.order)
     users: Mapped[List[Enrollment]] = relationship(back_populates="course")
+    tags: Mapped[List[Tag]] = relationship(secondary=CourseTag, back_populates="courses")
 
     def __repr__(self) -> str:
         return f"Course(id={self.id}, name={self.name})"
@@ -227,7 +283,8 @@ class Course(BaseModel):
             "id": self.id,
             "name": self.name,
             "price": self.price,
-            "description": self.description
+            "description": self.description,
+            "tags": self.tags
         }
         for attr in attrs:
             match attr:
