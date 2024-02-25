@@ -16,7 +16,11 @@ class UserRole(enum.Enum):
     USER = 2
 
 
-class BaseModel(DeclarativeBase):
+class Base(DeclarativeBase):
+    __abstract__ = True
+
+
+class BaseModel(Base):
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -26,7 +30,29 @@ class BaseModel(DeclarativeBase):
         pass
 
 
-class Enrollment(BaseModel):
+class PostModel(BaseModel):
+    __abstract__ = True
+
+    title: Mapped[str] = mapped_column(String(255))
+    video_url: Mapped[Optional[str]] = mapped_column(String(255))
+    duration: Mapped[Optional[int]]
+    content = mapped_column(Text, nullable=False)
+    create_time: Mapped[datetime]
+
+    @abstractmethod
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        data = {
+            "id": self.id,
+            "title": self.title,
+            "video_url": self.video_url,
+            "duration": self.duration,
+            "content": self.content,
+            "create_time": self.create_time,
+        }
+        return data
+
+
+class Enrollment(Base):
     __tablename__ = "enrollment"
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
@@ -39,7 +65,7 @@ class Enrollment(BaseModel):
     course: Mapped["Course"] = relationship(back_populates="users")
 
 
-class Progress(BaseModel):
+class Progress(Base):
     __tablename__ = "progress"
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
@@ -52,7 +78,7 @@ class Progress(BaseModel):
 
 Reaction = Table(
     "reaction",
-    BaseModel.metadata,
+    Base.metadata,
     Column("user_id", ForeignKey("user.id"), primary_key=True),
     Column("comment_id", ForeignKey("comment.id"), primary_key=True)
 )
@@ -65,9 +91,9 @@ class Comment(BaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id"))
     parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey("comment.id"), index=True)
-    create_time: Mapped[datetime] = mapped_column(default=datetime.now())
+    create_time: Mapped[datetime]
 
-    user_reactions: Mapped[List["User"]] = relationship("User", secondary=Reaction, back_populates="comments")
+    user_reactions: Mapped[List["User"]] = relationship(secondary=Reaction, back_populates="comments")
 
 
 class User(BaseModel):
@@ -85,10 +111,10 @@ class User(BaseModel):
 
     courses: Mapped[List[Enrollment]] = relationship(back_populates="user")
     lessons: Mapped[List[Progress]] = relationship(back_populates="user")
-    comments: Mapped[List["Comment"]] = relationship("Comment", secondary=Reaction, back_populates="user_reactions")
+    comments: Mapped[List[Comment]] = relationship(secondary=Reaction, back_populates="user_reactions")
 
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, username={self.username!r})"
+        return f"User(id={self.id}, username={self.username})"
 
 
 class Choice(BaseModel):
@@ -96,7 +122,7 @@ class Choice(BaseModel):
 
     content: Mapped[str] = mapped_column(String(255))
     is_correct: Mapped[bool] = mapped_column(default=False)
-    question_id: Mapped[int] = mapped_column(ForeignKey("question.id"))
+    question_id: Mapped[int] = mapped_column(ForeignKey("question.id", ondelete="CASCADE"))
 
     def __repr__(self) -> str:
         return ("Choice("
@@ -120,9 +146,9 @@ class Question(BaseModel):
 
     content: Mapped[str] = mapped_column(String(255))
     score: Mapped[int] = mapped_column(default=1)
-    lession_id: Mapped[int] = mapped_column(ForeignKey("lesson.id"))
+    lession_id: Mapped[int] = mapped_column(ForeignKey("lesson.id", ondelete="CASCADE"))
 
-    choices: Mapped[List[Choice]] = relationship(Choice, backref="question")
+    choices: Mapped[List[Choice]] = relationship(backref="question", cascade="all, delete")
 
     def as_dict(self, *attrs) -> dict[str, Any]:
         data = {
@@ -135,34 +161,23 @@ class Question(BaseModel):
         return data
 
 
-class Lesson(BaseModel):
-    # post and lesson
+class Lesson(PostModel):
     __tablename__ = "lesson"
 
     uuid = Column(BINARY(16), index=True, unique=True, default=uuid.uuid4().bytes)
-    title: Mapped[str] = mapped_column(String(255))
-    video_url: Mapped[Optional[str]] = mapped_column(String(255))
-    duration: Mapped[Optional[int]]
-    content = mapped_column(Text, nullable=False)
-    create_time: Mapped[datetime] = mapped_column(default=datetime.now())
-    chapter_id: Mapped[int] = mapped_column(ForeignKey("chapter.id"))
+    chapter_id: Mapped[int] = mapped_column(ForeignKey("chapter.id", ondelete="CASCADE"))
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
     users: Mapped[List[Progress]] = relationship(back_populates="lesson")
-    questions: Mapped[List[Question]] = relationship(Question, backref="lesson")
+    questions: Mapped[List[Question]] = relationship(backref="lesson", cascade="all, delete")
 
     def __repr__(self) -> str:
         return f"Lesson(id={self.id}, uuid={self.uuid}, title={self.title})"
 
     def as_dict(self, *attrs) -> dict[str, Any]:
         data = {
-            "id": self.id,
+            **super().as_dict(*attrs),
             "uuid": uuid.UUID(bytes=self.uuid),
-            "title": self.title,
-            "video_url": self.video_url,
-            "duration": self.duration,
-            "content": self.content,
-            "create_time": self.create_time,
             "chapter_id": self.chapter_id,
             "author_id": self.author_id,
             "questions": [question.as_dict() for question in self.questions]
@@ -174,9 +189,9 @@ class Chapter(BaseModel):
     __tablename__ = "chapter"
 
     name: Mapped[str] = mapped_column(String(255))
-    course_id: Mapped[int] = mapped_column(ForeignKey("course.id"))
+    course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"))
 
-    lessons: Mapped[List[Lesson]] = relationship(Lesson, backref="chapter")
+    lessons: Mapped[List[Lesson]] = relationship(backref="chapter", cascade="all, delete")
 
     def __repr__(self) -> str:
         return f"Chapter(id={self.id}, name={self.name})"
@@ -201,7 +216,7 @@ class Course(BaseModel):
     price: Mapped[int] = mapped_column(default=0)
     description = mapped_column(Text)
 
-    chapters: Mapped[List[Chapter]] = relationship(Chapter, backref="course")
+    chapters: Mapped[List[Chapter]] = relationship(backref="course", cascade="all, delete")
     users: Mapped[List[Enrollment]] = relationship(back_populates="course")
 
     def __repr__(self) -> str:
@@ -230,15 +245,8 @@ if __name__ == "__main__":
         m.drop_all(db.engine)
 
         print("Create all")
-        BaseModel.metadata.create_all(bind=db.engine)
+        Base.metadata.create_all(bind=db.engine)
 
         print("Importing data")
         from .import_data import import_data
         import_data(db)
-
-        # Test
-        # course = db.session.get(Course, 1)
-        # print(course)
-        # for chapter in course.chapters:
-        #     print(chapter.as_dict())
-
