@@ -121,6 +121,7 @@ class Tag(BaseModel):
 class Blog(PostModel):
     __tablename__ = "blog"
 
+    img_url: Mapped[Optional[str]] = mapped_column(String(255))
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
     tags: Mapped[List[Tag]] = relationship(secondary=BlogTag, back_populates="blogs")
