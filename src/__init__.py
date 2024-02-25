@@ -5,8 +5,11 @@ from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from dotenv import dotenv_values
 
 from .router import Router
+
+config = dotenv_values(".env")
 
 app = Flask(__name__)
 app.secret_key = '689567gh$^^&*#%^&*^&%^*DFGH^&*&*^*'
@@ -19,9 +22,9 @@ app.secret_key = '689567gh$^^&*#%^&*^&%^*DFGH^&*&*^*'
 # )
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     "mysql+pymysql://{user}:{password}@{host}:{port}/{db_name}".format(
-        user="testuser", password=quote("Admin@123"),
-        host="localhost", port="3306",
-        db_name="codeheroes"
+        user=config["DB_USER"], password=quote(config["DB_PASSWORD"]),
+        host=config["DB_HOST"], port=config["DB_PORT"],
+        db_name=config["DB_NAME"]
     )
 )
 
