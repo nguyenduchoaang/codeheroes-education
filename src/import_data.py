@@ -1,22 +1,33 @@
 import uuid
+from datetime import datetime
+
 from .models import *
 from .utils.hash import hash_password
+
+USERS = [
+    {
+        "username": "user",
+        "password": hash_password("123"),
+        "email": "test@codeheroes.com",
+        "name": "Test User"
+    }
+]
 
 COURSES = [
     {
         "name": "Xây Dựng Website với ReactJS",
         "price": 0,
-        "description": ""
+        "description": None
     },
     {
         "name": "Làm việc với Terminal & Ubuntu",
         "price": 0,
-        "description": ""
+        "description": None
     },
     {
         "name": "HTML CSS Pro",
         "price": 1_299_000,
-        "description": ""
+        "description": None
     }
 ]
 
@@ -33,14 +44,15 @@ CHAPTERS = [
     { "name": "Hoàn thành khóa học", "course_id": 2 }
 ]
 
-LESSON = [
+LESSONS = [
     {
         "uuid": uuid.uuid4().bytes,
         "title": "ReactJS là gì? Tại sao nên học ReactJS?",
         "duration": 641,
         "content": "",
         "chapter_id": 1,
-        "author_id": 1
+        "author_id": 1,
+        "create_time": datetime.now()
     },
     {
         "uuid": uuid.uuid4().bytes,
@@ -48,37 +60,16 @@ LESSON = [
         "duration": 1340,
         "content": "",
         "chapter_id": 1,
-        "author_id": 1
+        "author_id": 1,
+        "create_time": datetime.now()
     }
 ]
 
 def import_data(db):
-    user = User(
-        username="user",
-        password=hash_password("123"),
-        email="test@codeheroes.com", name="Test User"
-    )
-    db.session.add(user)
+    add_all = lambda model, data: db.session.add_all([model(**d) for d in data])
+
+    add_all(User, USERS)
+    add_all(Course, COURSES)
+    add_all(Chapter, CHAPTERS)
+    add_all(Lesson, LESSONS)
     db.session.commit()
-
-    for course in COURSES:
-        course_obj = Course(name=course["name"], price=course["price"], description=course["description"])
-        db.session.add(course_obj)
-        db.session.commit()
-
-    for chapter in CHAPTERS:
-        chapter_obj = Chapter(name=chapter["name"], course_id=chapter["course_id"])
-        db.session.add(chapter_obj)
-        db.session.commit()
-
-    for lesson in LESSON:
-        lesson_obj = Lesson(
-            uuid=lesson["uuid"],
-            title=lesson["title"],
-            duration=lesson["duration"],
-            content=lesson["content"],
-            chapter_id=lesson["chapter_id"],
-            author_id=lesson["author_id"]
-        )
-        db.session.add(lesson_obj)
-        db.session.commit()
