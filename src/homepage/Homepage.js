@@ -2,51 +2,58 @@ import styled from "styled-components";
 import BannerCodeheroes from "../assets/BannerCodeHeroes.png";
 import course1 from "../assets/anh1.png";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-const tags = {
-  1: "Pro",
-  2: "Basic",
-};
+import { useEffect, useState } from "react";
+import CourseServices from "../based/services/CousreServices";
+import useStore from "../based/store/useStore";
 
-const ListProCourse = [
-  {
-    id: 1,
-    title: "Lập trình web",
-    img: course1,
-    price: "1.000.000",
-    sale_price: "500.000",
-    tag: 1,
-  },
-  {
-    id: 1,
-    title: "Lập trình web",
-    img: course1,
-    price: "1.000.000",
-    sale_price: "500.000",
-    tag: 1,
-  },
-  {
-    id: 1,
-    title: "Lập trình web",
-    img: course1,
-    price: "1.000.000",
-    sale_price: "500.000",
-    tag: 1,
-  },
-  {
-    id: 1,
-    title: "Lập trình web",
-    img: course1,
-    price: "1.000.000",
-    sale_price: "500.000",
-    tag: 1,
-  },
-];
 const Homepage = () => {
+  const [listCourse, setListCourse] = useState([]);
+  const [state, dispatch] = useStore();
+  async function GetAllCourse() {
+    const [err, data] = await CourseServices.GetAllCourse();
+    if (!err) setListCourse(data);
+    else console.log(err);
+  }
+
+  useEffect(() => {
+    GetAllCourse();
+  }, []);
+  const handleFileChange = (e) => {
+    e.preventDefault();
+    let reader = new FileReader();
+    let file = e.target.files[0];
+    if (file) {
+      //  reader.onloadend = () => {
+      //    Request.UploadStockPhoto(file)
+      //      .then((res) => {
+      //        if (res && res.data) {
+      //          setThumbnail(res.data.imageUrl);
+      //        } else {
+      //          let errMsg =
+      //            res.errors && res.errors.length > 0
+      //              ? res.errors.reduce((prev, item, idx) => {
+      //                  return `${prev}${item.value}<br/>`;
+      //                }, "")
+      //              : "" || CONSTANTS.MSG_ERROR;
+      //          Notify(NOTIFY.ERROR, NOTIFY.ERROR, errMsg);
+      //        }
+      //        setLoading(false);
+      //      })
+      //      .catch((err) => {
+      //        setLoading(false);
+      //      });
+      //  };
+      console.log(file);
+
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <>
       <HomeWrapper>
         <HomeTop>
+          <input type="file" onChange={handleFileChange} />
           <Banner>
             <ImgBanner src={BannerCodeheroes}></ImgBanner>
           </Banner>
@@ -55,26 +62,27 @@ const Homepage = () => {
           <ProCourse>
             <Title>Khóa học Pro</Title>
             <CourseWrapper>
-              {ListProCourse.map((item, index) => (
-                <>
-                  <Item>
-                    <ImgWrapper>
-                      <ModalShowCourse>
-                        <Link to="course/1">
-                          {" "}
-                          <ButtonModal>Xem khóa học</ButtonModal>
-                        </Link>
-                      </ModalShowCourse>
-                      <ImgCourse src={item.img}></ImgCourse>
-                    </ImgWrapper>
-                    <TitleCourse>{item.title}</TitleCourse>
-                    <PriceWrapper>
-                      <Price>{item.price} đ</Price>
-                      <SalePrice>{item.sale_price} đ</SalePrice>
-                    </PriceWrapper>
-                  </Item>
-                </>
-              ))}
+              {listCourse &&
+                listCourse.map((item, index) => (
+                  <>
+                    <Item key={index}>
+                      <ImgWrapper>
+                        <ModalShowCourse>
+                          <Link to={`course/${item.id}`}>
+                            {" "}
+                            <ButtonModal>Xem khóa học</ButtonModal>
+                          </Link>
+                        </ModalShowCourse>
+                        <ImgCourse src={course1} alt="#"></ImgCourse>
+                      </ImgWrapper>
+                      <TitleCourse>{item.name}</TitleCourse>
+                      <PriceWrapper>
+                        <Price>{item.price} đ</Price>
+                        {/* <SalePrice>{item.sale_price} đ</SalePrice> */}
+                      </PriceWrapper>
+                    </Item>
+                  </>
+                ))}
             </CourseWrapper>
           </ProCourse>
         </HomeCenter>

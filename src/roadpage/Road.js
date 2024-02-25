@@ -59,17 +59,17 @@ const Road = () => {
           <Bottom>
             <BottomWrapper>
               <ItemBotLeft>
-               <IBLWrapper>
-                    <TitleBottom>
-                      Tham gia cộng đồng học viên CodeHeroes trên Facebook
-                    </TitleBottom>
-                    <ContentBottom>
-                      Hàng nghìn người khác đang học lộ trình giống như bạn. Hãy
-                      tham gia hỏi đáp, chia sẻ và hỗ trợ nhau trong quá trình học
-                      nhé.
-                    </ContentBottom>
-                    <ActionBottom>Tham gia nhóm</ActionBottom>
-               </IBLWrapper>
+                <IBLWrapper>
+                  <TitleBottom>
+                    Tham gia cộng đồng học viên CodeHeroes trên Facebook
+                  </TitleBottom>
+                  <ContentBottom>
+                    Hàng nghìn người khác đang học lộ trình giống như bạn. Hãy
+                    tham gia hỏi đáp, chia sẻ và hỗ trợ nhau trong quá trình học
+                    nhé.
+                  </ContentBottom>
+                  <ActionBottom>Tham gia nhóm</ActionBottom>
+                </IBLWrapper>
               </ItemBotLeft>
               <ItemRightLeft>
                 <RoadBanner src={road_banner}></RoadBanner>
@@ -210,12 +210,12 @@ const ItemBotLeft = styled.div`
 
 const TitleBottom = styled(ConfigTitle)`
   font-size: 24px;
-  margin-bottom:20px;
+  margin-bottom: 20px;
 `;
 
 const ContentBottom = styled.h3`
   font-size: 14px;
-  margin-bottom:20px;
+  margin-bottom: 20px;
 `;
 
 const ActionBottom = styled.button`
@@ -241,7 +241,6 @@ const RoadBanner = styled.img`
   width: 360px;
 `;
 
-
 const IBLWrapper = styled.div`
-    width:60%;
+  width: 60%;
 `;

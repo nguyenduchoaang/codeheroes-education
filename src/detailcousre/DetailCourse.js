@@ -4,6 +4,10 @@ import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tick, Play } from "../based/Icon";
+import ChapterServices from "../based/services/ChapterServices";
+import CourseServices from "../based/services/CousreServices";
+import UserServices from "../based/services/UserSevices";
+
 const course_detail = {
   title: "Kiến Thức Nhập Môn IT",
   sub_title:
@@ -19,60 +23,64 @@ const course_detail = {
   time: "03 giờ 26 phút",
 };
 
-const details_lessons = [
-  {
-    id: 1,
-    title: "1. Giới thiệu khóa học",
-    lessons: [
-      {
-        id: 1,
-        title: "1. Mô hình Client - Server là gì?",
-        time: "11:35",
-      },
-      {
-        id: 2,
-        title: "2. Các ngôn ngữ lập trình phổ biến",
-        time: "10:35",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "2. Môi trường, con người IT",
-    lessons: [
-      {
-        id: 1,
-        title: "3.Mô hình Client - Server là gì?",
-        time: "11:35",
-      },
-      {
-        id: 2,
-        title: "4. Các ngôn ngữ lập trình phổ biến",
-        time: "10:35",
-      },
-    ],
-  },
-];
-
 const DetailCourse = () => {
   const { id } = useParams();
-  const [course, setCourse] = useState({});
-  //   useEffect(() => {
-  //     fetch(`http://localhost:3000/courses/${id}`)
-  //       .then((res) => res.json())
-  //       .then((data) => setCourse(data));
-  //   }, [id]);
+  const [courseDetails, setCourseDetails] = useState({});
+  const [detailsChapter, setDetailsChapter] = useState([]);
+  const [selectedChapter, setSelectedChapter] = useState();
+
+  async function GetDetailsChapterById() {
+    const [err, data] = await ChapterServices.GetDetailsChapterById(
+      selectedChapter
+    );
+    if (!err && data) {
+      setDetailsChapter(data);
+    } else {
+      console.log(err);
+    }
+  }
+  console.log(selectedChapter);
+
+  useEffect(() => {
+    GetDetailsChapterById();
+  }, [selectedChapter]);
+
+  console.log("details", detailsChapter);
+
+  async function GetcourseDetailsById(id) {
+    const [err, data] = await CourseServices.GetCourseById(id);
+    if (!err && data) {
+      setCourseDetails(data);
+    } else {
+      console.log(err);
+    }
+  }
+
+  async function EnrollCourse() {
+    const [err, data] = await UserServices.EnrollCourse(id);
+    if (!err && data) {
+      console.log(data);
+    } else {
+      console.log(err);
+    }
+  }
+
+  async function HandleEnrollCourse() {
+    await EnrollCourse();
+  }
+
+  useEffect(() => {
+    GetcourseDetailsById(id);
+  }, [id]);
+
   return (
     <DetailCourseWrapper>
       <DetailCourseInner>
         <DCLeft>
           <Header>
-            <TitleHeader>{course_detail.title}</TitleHeader>
+            <TitleHeader>{courseDetails.name}</TitleHeader>
             <SubHeader>
-              <SubHeaderTitle>
-                Để có cái nhìn tổng quan về ngành IT - Lập trình web các bạn nên
-                xem các videos tại khóa này trước nhé.
-              </SubHeaderTitle>
+              <SubHeaderTitle>{courseDetails.description}</SubHeaderTitle>
             </SubHeader>
             <Experience>
               <ContentTitle>Bạn sẽ học được gì</ContentTitle>
@@ -114,34 +122,36 @@ const DetailCourse = () => {
             </SubTitle>
 
             <Content>
-              {details_lessons.map((d, i) => (
-                <>
-                  <LessonWrapper>
-                    <HeaderContent>
-                      <ContentIL>
-                        <IconL>-</IconL>
-                      </ContentIL>
-                      <ContentIR>
-                        <TitleR>{d.title}</TitleR>
-                      </ContentIR>
-                    </HeaderContent>
-                    <ContentUl>
-                      {d.lessons.map((l, i) => (
-                        <ContentLi key={i}>
-                          <ItemLiLeft>
-                            <IconPlayWrapper>
-                              {" "}
-                              <Play active={true} />
-                            </IconPlayWrapper>
-                            <TitleLi>{l.title}</TitleLi>
-                          </ItemLiLeft>
-                          <ItemLiRight>{l.time}</ItemLiRight>
-                        </ContentLi>
-                      ))}
-                    </ContentUl>
-                  </LessonWrapper>
-                </>
-              ))}
+              {courseDetails.chapters &&
+                courseDetails.chapters.map((d, i) => (
+                  <>
+                    <LessonWrapper>
+                      <HeaderContent>
+                        <ContentIL>
+                          <IconL>-</IconL>
+                        </ContentIL>
+                        <ContentIR onClick={() => setSelectedChapter(d.id)}>
+                          <TitleR>{d.name}</TitleR>
+                        </ContentIR>
+                      </HeaderContent>
+                      <ContentUl>
+                        {detailsChapter.course_id == d.id &&
+                          detailsChapter.lessons.map((l, i) => (
+                            <ContentLi key={i}>
+                              <ItemLiLeft>
+                                <IconPlayWrapper>
+                                  {" "}
+                                  <Play active={true} />
+                                </IconPlayWrapper>
+                                <TitleLi>{l.content}</TitleLi>
+                              </ItemLiLeft>
+                              <ItemLiRight>{l.duration}</ItemLiRight>
+                            </ContentLi>
+                          ))}
+                      </ContentUl>
+                    </LessonWrapper>
+                  </>
+                ))}
             </Content>
           </Body>
         </DCLeft>
@@ -149,10 +159,10 @@ const DetailCourse = () => {
           <DCRightCourse></DCRightCourse>
           <DCRContent>
             <DCRTitle>Miễn phí</DCRTitle>
-            <Link to="/lesson/1">
-              {" "}
-              <DCRButton>Đăng kí khóa học</DCRButton>
-            </Link>
+
+            <DCRButton onClick={() => EnrollCourse()}>
+              Đăng kí khóa học
+            </DCRButton>
           </DCRContent>
         </DCRight>
       </DetailCourseInner>

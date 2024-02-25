@@ -37,89 +37,87 @@ const Lesson = () => {
   ];
 
   return (
-    <>
-      <LessonWrapper>
-        <Header>
-          <ItemLeft>
-            <ItemLeftTitle>Kiến thức nhập môn IT</ItemLeftTitle>
-          </ItemLeft>
-          <ItemRight>
-            <Process>0/12</Process>
-            <Note>
-              <IconNote></IconNote>
-              <TitleNote>Ghi chú</TitleNote>
-            </Note>
-            <Intrust>
-              <IconNote></IconNote>
-              <TitleNote>Hướng dẫn</TitleNote>
-            </Intrust>
-          </ItemRight>
-        </Header>
-        <Body>
-          <RightItem>
-            <Content>
-              {details_lessons.map((d, i) => (
-                <>
-                  <LessonWrapper2>
-                    <HeaderContent>
-                      <ContentIR>
-                        <TitleR>{d.title}</TitleR>
-                      </ContentIR>
-                    </HeaderContent>
-                    <BodyContentLesson>
-                      {d.lessons.map((l, i) => (
+    <LessonWrapper>
+      <Header>
+        <ItemLeft>
+          <ItemLeftTitle>Kiến thức nhập môn IT</ItemLeftTitle>
+        </ItemLeft>
+        <ItemRight>
+          <Process>0/12</Process>
+          <Note>
+            <IconNote></IconNote>
+            <TitleNote>Ghi chú</TitleNote>
+          </Note>
+          <Intrust>
+            <IconNote></IconNote>
+            <TitleNote>Hướng dẫn</TitleNote>
+          </Intrust>
+        </ItemRight>
+      </Header>
+      <Body>
+        <RightItem>
+          <Content>
+            {details_lessons.map((d, i) => (
+              <>
+                <LessonWrapper2>
+                  <HeaderContent>
+                    <ContentIR>
+                      <TitleR>{d.title}</TitleR>
+                    </ContentIR>
+                  </HeaderContent>
+                  <BodyContentLesson>
+                    {d.lessons.map((l, i) => (
+                      <p key={i}>
                         <ContentUl>
-                          {" "}
-                          <ContentLi key={i}>
+                          <ContentLi>
                             <ItemLiLeft>
                               <TitleLi>{l.title}</TitleLi>
                             </ItemLiLeft>
                             <ItemLiRight>
                               <IconPlayWrapper>
-                                {" "}
                                 <Play active={true} />
                               </IconPlayWrapper>
                               <TitleLi>{l.time}</TitleLi>
                             </ItemLiRight>
                           </ContentLi>
                         </ContentUl>
-                      ))}
-                    </BodyContentLesson>
-                  </LessonWrapper2>
-                </>
-              ))}
-            </Content>
-          </RightItem>
-          <LeftItem>
-            <VideoLesson>
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/QTuYMHs2PV4?si=ATaQLZwE85bb0BDl"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen
-              ></iframe>
-            </VideoLesson>
-            <Description>
-              <DTitle>Mô hình Client - Server là gì?</DTitle>
-              <DTime>Cập nhật tháng 11 năm 2022</DTime>
-            </Description>
-          </LeftItem>
-        </Body>
-        <Footer>
-          <ButtonPrevios>
-            <IconPreWrapper></IconPreWrapper>
-            <Title>BÀI TRƯỚC</Title>
-          </ButtonPrevios>
-          <ButtonNext>
-            <IconPreWrapper></IconPreWrapper>
-            <Title>BÀI TIẾP THEO</Title>
-          </ButtonNext>
-        </Footer>
-      </LessonWrapper>
-    </>
+                      </p>
+                    ))}
+                  </BodyContentLesson>
+                </LessonWrapper2>
+              </>
+            ))}
+          </Content>
+        </RightItem>
+        <LeftItem>
+          <VideoLesson>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/QTuYMHs2PV4?si=ATaQLZwE85bb0BDl"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </VideoLesson>
+          <Description>
+            <DTitle>Mô hình Client - Server là gì?</DTitle>
+            <DTime>Cập nhật tháng 11 năm 2022</DTime>
+          </Description>
+        </LeftItem>
+      </Body>
+      <Footer>
+        <ButtonPrevios>
+          <IconPreWrapper></IconPreWrapper>
+          <Title>BÀI TRƯỚC</Title>
+        </ButtonPrevios>
+        <ButtonNext>
+          <IconPreWrapper></IconPreWrapper>
+          <Title>BÀI TIẾP THEO</Title>
+        </ButtonNext>
+      </Footer>
+    </LessonWrapper>
   );
 };
 
