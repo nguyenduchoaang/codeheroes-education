@@ -106,5 +106,5 @@ class LessonController:
 
         db.session.execute(stmt)
         db.session.commit()
-        return jsonify({"message": "Delete Chapter successfully"}), 200
+        return jsonify({"message": "Delete Lesson successfully"}), 200
 
