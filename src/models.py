@@ -99,6 +99,18 @@ CourseTag = Table(
     Column("tag_id", ForeignKey("tag.id"), primary_key=True)
 )
 
+class LearningObjective(BaseModel):
+    __tablename__ = "learning_objective"
+
+    name: Mapped[str] = mapped_column(String(255))
+
+    course_id: Mapped[int] = mapped_column(ForeignKey("course.id"))
+
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        return {
+            "name": self.name
+        }
+
 
 class Tag(BaseModel):
     __tablename__ = "tag"
@@ -271,6 +283,7 @@ class Course(BaseModel):
     img_url: Mapped[Optional[str]] = mapped_column(String(255))
     description = mapped_column(Text)
 
+    objectives: Mapped[List[LearningObjective]] = relationship(backref="course")
     chapters: Mapped[List[Chapter]] = relationship(backref="course", cascade="all, delete",
                                                    collection_class=ordering_list("order"),
                                                    order_by=Chapter.order)
@@ -298,6 +311,8 @@ class Course(BaseModel):
                     data["users"] = self.users
                 case "users_count":
                     data["users_count"] = len(self.users)
+                case "objectives":
+                    data["objectives"] = [obj.name for obj in self.objectives]
         return data
 
 if __name__ == "__main__":

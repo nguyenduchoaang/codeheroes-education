@@ -23,7 +23,7 @@ class CourseController:
         course = db.session.execute(stmt).first()
         if course is None:
             return jsonify(msg="Course ID not exist"), 404
-        return jsonify(course[0].as_dict("chapters")), 200
+        return jsonify(course[0].as_dict("chapters", "objectives")), 200
 
     @staticmethod
     def create():
