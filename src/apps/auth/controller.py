@@ -37,7 +37,7 @@ class AuthController:
                                   User.password == hash_password(password))
         user = db.session.execute(stmt).first()
         if user is None:
-            return jsonify({"message": "Bad username or password"}), 401
+            return jsonify({"message": "Bad username or password"}), 400
 
         access_token = create_access_token(identity=user[0].username)
         return jsonify(access_token=access_token)
