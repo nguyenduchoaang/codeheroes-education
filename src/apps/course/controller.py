@@ -5,7 +5,7 @@ from sqlalchemy import select, delete, update
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from src import db
-from src.models import Course, Enrollment, User
+from src.models import Course, Enrollment, Progress, User
 
 
 class CourseController:
@@ -13,14 +13,16 @@ class CourseController:
     def all():
         stmt = select(Course)
         rows = db.session.execute(stmt).all()
-        return jsonify([course[0].as_dict() for course in rows]), 200
+        return jsonify([
+            course[0].as_dict("users_count", "img_url") for course in rows
+        ]), 200
 
     @staticmethod
     def one(id: int):
         stmt = select(Course).where(Course.id == id)
         course = db.session.execute(stmt).first()
         if course is None:
-            return jsonify({"message": "Course ID not exist"}), 404
+            return jsonify(msg="Course ID not exist"), 404
         return jsonify(course[0].as_dict("chapters")), 200
 
     @staticmethod
@@ -92,6 +94,12 @@ class CourseController:
         enrollment = Enrollment(start_date=datetime.now())
         enrollment.course = course[0]
         user[0].courses.append(enrollment)
+
+        # Tracking progress for first lesson
+        progress = Progress()
+        progress.lesson = course[0].chapters[0].lessons[0]
+        user[0].lessons.append(progress)
+
         db.session.commit()
 
         return jsonify(msg="Enroll course successfully"), 200

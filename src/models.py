@@ -37,7 +37,7 @@ class PostModel(BaseModel):
     title: Mapped[str] = mapped_column(String(255))
     video_url: Mapped[Optional[str]] = mapped_column(String(255))
     duration: Mapped[Optional[int]]
-    content = mapped_column(Text, nullable=False)
+    content = mapped_column(Text)
     create_time: Mapped[datetime]
 
     @abstractmethod
@@ -268,6 +268,7 @@ class Course(BaseModel):
 
     name: Mapped[str] = mapped_column(String(255))
     price: Mapped[int] = mapped_column(default=0)
+    img_url: Mapped[Optional[str]] = mapped_column(String(255))
     description = mapped_column(Text)
 
     chapters: Mapped[List[Chapter]] = relationship(backref="course", cascade="all, delete",
@@ -289,10 +290,14 @@ class Course(BaseModel):
         }
         for attr in attrs:
             match attr:
+                case "img_url":
+                    data["img_url"] = self.img_url
                 case "chapters":
                     data["chapters"] = [chapter.as_dict() for chapter in self.chapters]
                 case "users":
                     data["users"] = self.users
+                case "users_count":
+                    data["users_count"] = len(self.users)
         return data
 
 if __name__ == "__main__":
