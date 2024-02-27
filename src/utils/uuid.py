@@ -1,11 +1,5 @@
 import uuid
 
-def bin_to_uuid(bin: bytes) -> str:
-    return str(uuid.UUID(int=int.from_bytes(bin)))
-
-def uuid_to_bin(uuid_str: str) -> bytes:
-    return uuid.UUID(uuid_str).bytes
-
 def is_valid_uuid(uuid_to_test, version=4):
     """
     Check if uuid_to_test is a valid UUID.
@@ -32,3 +26,12 @@ def is_valid_uuid(uuid_to_test, version=4):
     except ValueError:
         return False
     return str(uuid_obj) == uuid_to_test
+
+def bin_to_uuid(bin: bytes) -> str:
+    return str(uuid.UUID(int=int.from_bytes(bin)))
+
+def uuid_to_bin(uuid_str: str) -> bytes | str:
+    if len(uuid_str) == 36 and is_valid_uuid(uuid_str):
+        return uuid.UUID(uuid_str).bytes
+    else:
+        return uuid_str
