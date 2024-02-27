@@ -96,5 +96,3 @@ OBJECTIVES = [
     } for data in archive_data
         for obj in data["objectives"]
 ]
-
-print(OBJECTIVES)
