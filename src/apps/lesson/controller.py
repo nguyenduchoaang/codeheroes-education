@@ -2,11 +2,12 @@ import uuid
 from datetime import datetime
 
 from flask import jsonify, request
-from sqlalchemy import delete, select, update
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy import delete, select, text, update
 
 from src import db
-from src.models import Lesson
-from src.utils.uuid import uuid_to_bin, is_valid_uuid
+from src.models import Chapter, Course, Lesson, Progress, User
+from src.utils.uuid import bin_to_uuid, uuid_to_bin, is_valid_uuid
 
 
 class LessonController:
@@ -40,7 +41,14 @@ class LessonController:
         duration = data.get("duration", 60)
         content = data.get("content", "")
         chapter_id = data.get("chapter_id", None)
-        author_id = data.get("author_id", None)
+
+        if chapter_id is None:
+            return jsonify(msg="Missing Chapter ID")
+
+        chapter = db.session.execute(select(Chapter).where(Chapter.id == chapter_id)).first()
+        if chapter is None:
+            return jsonify(msg="Chapter ID is invalid")
+
 
         lesson = Lesson(
             uuid=uuid.uuid4().bytes,
@@ -49,8 +57,8 @@ class LessonController:
             duration=duration,
             content=content,
             create_time=datetime.now(),
-            chapter_id=chapter_id,
-            author_id=author_id
+            order=len(chapter.lessons) + 1,
+            chapter_id=chapter_id
         )
         db.session.add(lesson)
         db.session.commit()
@@ -108,3 +116,57 @@ class LessonController:
         db.session.commit()
         return jsonify({"message": "Delete Lesson successfully"}), 200
 
+    @staticmethod
+    @jwt_required()
+    def save_progress(uuid: str):
+        username = get_jwt_identity()
+
+        user = db.session.execute(select(User).where(User.username == username)).first()
+        if user is None:
+            return jsonify(msg="User does not exist")
+
+        # Check lesson is completed
+        stmt = text("""
+            update progress
+            set completed = 1
+            where user_id = :user_id
+                and lesson_id = (
+                    select id
+                    from lesson
+                    where id = :id
+                        or uuid = :uuid
+                )
+        """)
+        db.session.execute(stmt, {
+            "user_id": user[0].id,
+            "id": uuid,
+            "uuid": uuid_to_bin(uuid)
+        })
+
+        # Add new track on next lesson
+        try:
+            stmt = LessonController.__add_conditional_statement(select(Lesson), uuid)
+        except ValueError:
+            return jsonify({"message": "Lesson ID is invalid"})
+
+        lesson = db.session.execute(stmt).first()
+        if lesson is None:
+            return None
+
+        next_lesson_uuid = None
+        reach_current_lesson = False
+        for chapter in lesson[0].chapter.course.chapters:
+            for lesson in chapter.lessons:
+                if reach_current_lesson:
+                    next_lesson_uuid = bin_to_uuid(lesson.uuid)
+                    progress = Progress(course_id=lesson.chapter.course_id)
+                    progress.lesson = lesson
+                    user[0].lesson_progress.append(progress)
+                    break
+                elif str(lesson.id) == uuid or lesson.uuid == uuid_to_bin(uuid):
+                    reach_current_lesson = True
+                    continue
+            if reach_current_lesson:
+                break
+        db.session.commit()
+        return jsonify(msg="Update successfully", next=next_lesson_uuid), 200

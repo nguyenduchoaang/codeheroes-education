@@ -71,10 +71,11 @@ class Progress(Base):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
     lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id"), primary_key=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("course.id"))
     completed: Mapped[bool] = mapped_column(default=False)
 
-    user: Mapped["User"] = relationship(back_populates="lessons")
-    lesson: Mapped["Lesson"] = relationship(back_populates="users")
+    user: Mapped["User"] = relationship(back_populates="lesson_progress")
+    lesson: Mapped["Lesson"] = relationship(back_populates="user_progress")
 
 
 Reaction = Table(
@@ -173,8 +174,9 @@ class User(BaseModel):
 
     blogs: Mapped[List[Blog]] = relationship(backref="user")
     courses: Mapped[List[Enrollment]] = relationship(back_populates="user")
-    lessons: Mapped[List[Progress]] = relationship(back_populates="user")
     comments: Mapped[List[Comment]] = relationship(secondary=Reaction, back_populates="user_reactions")
+
+    lesson_progress: Mapped[List[Progress]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
         return f"User(id={self.id}, username={self.username})"
@@ -231,8 +233,9 @@ class Lesson(PostModel):
     order: Mapped[int]
     chapter_id: Mapped[int] = mapped_column(ForeignKey("chapter.id", ondelete="CASCADE"))
 
-    users: Mapped[List[Progress]] = relationship(back_populates="lesson")
     questions: Mapped[List[Question]] = relationship(backref="lesson", cascade="all, delete")
+
+    user_progress: Mapped[List[Progress]] = relationship(back_populates="lesson")
 
     def __repr__(self) -> str:
         return f"Lesson(id={self.id}, uuid={self.uuid}, title={self.title})"
@@ -272,6 +275,8 @@ class Chapter(BaseModel):
                     data["lessons"] = [lesson.as_dict() for lesson in self.lessons]
                 case "course_id":
                     data["course_id"] = self.course_id
+                case "lessons_count":
+                    data["lessons_count"] = len(self.lessons)
         return data
 
 
@@ -306,7 +311,7 @@ class Course(BaseModel):
                 case "img_url":
                     data["img_url"] = self.img_url
                 case "chapters":
-                    data["chapters"] = [chapter.as_dict() for chapter in self.chapters]
+                    data["chapters"] = [chapter.as_dict("lessons_count") for chapter in self.chapters]
                 case "users":
                     data["users"] = self.users
                 case "users_count":

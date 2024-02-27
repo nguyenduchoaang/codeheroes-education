@@ -6,6 +6,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from src import db
 from src.models import Course, Enrollment, Progress, User
+from src.utils.uuid import bin_to_uuid
 
 
 class CourseController:
@@ -85,7 +86,7 @@ class CourseController:
         user = db.session.execute(stmt).first()
 
         if user is None:
-            return jsonify(msg="Invalid user"), 401
+            return jsonify(msg="Invalid user"), 400
 
         for enrollment in user[0].courses:
             if enrollment.course.id == id:
@@ -96,10 +97,29 @@ class CourseController:
         user[0].courses.append(enrollment)
 
         # Tracking progress for first lesson
-        progress = Progress()
+        progress = Progress(course_id=id)
         progress.lesson = course[0].chapters[0].lessons[0]
-        user[0].lessons.append(progress)
+        user[0].lesson_progress.append(progress)
 
         db.session.commit()
 
         return jsonify(msg="Enroll course successfully"), 200
+
+    @staticmethod
+    @jwt_required()
+    def current_lesson(id: str):
+        username = get_jwt_identity()
+        stmt = select(User).where(User.username == username)
+        user = db.session.execute(stmt).first()
+
+        if user is None:
+            return jsonify(msg="Invalid user"), 400
+
+        current_lesson_uuid = None
+        for progress in user[0].lesson_progress:
+            if progress.course_id != id:
+                continue
+
+            current_lesson_uuid = bin_to_uuid(progress.lesson.uuid)
+        return jsonify(current_lesson_uuid=current_lesson_uuid), 200
+
