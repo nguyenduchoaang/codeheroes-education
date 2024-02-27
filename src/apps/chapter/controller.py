@@ -19,8 +19,9 @@ class ChapterController:
         data = request.get_json()
         name = data.get("name", None)
         course_id = data.get("course_id", None)
+        order = data.get("order", 1)
 
-        chapter = Chapter(name=name, course_id=course_id)
+        chapter = Chapter(name=name, course_id=course_id, order=order)
         db.session.add(chapter)
         db.session.commit()
         return jsonify({"message": "Create Chapter successfully"}), 201
