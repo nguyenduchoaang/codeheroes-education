@@ -86,7 +86,25 @@ archive_data = [
             'Xây dựng gutters với Sass',
             'Hoàn thiện grid system với Sass'
         ]
-    }
+    },
+    {
+        "course_id": 5,
+        "objectives": [
+            'Các kiến thức cơ bản, nền móng của ngành IT',
+            'Các mô hình, kiến trúc cơ bản khi triển khai ứng dụng',
+            'Các khái niệm, thuật ngữ cốt lõi khi triển khai ứng dụng',
+            'Hiểu hơn về cách internet và máy vi tính hoạt động'
+        ]
+    },
+    {
+        "course_id": 7,
+        "objectives": [
+            'Biết cách xây dựng website Responsive',
+            'Hiểu được tư tưởng thiết kế với Grid system',
+            'Tự tay xây dựng được thư viện CSS Grid',
+            'Tự hiểu được Grid layout trong bootstrap'
+        ]
+    },
 ]
 
 OBJECTIVES = [

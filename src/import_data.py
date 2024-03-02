@@ -5,6 +5,8 @@ from .test.data.courses import COURSES
 from .test.data.chapters import CHAPTERS
 from .test.data.lessons import LESSONS
 from .test.data.objectives import OBJECTIVES
+from .test.data.tags import TAGS
+from .test.data.course_tag import COURSE_TAG
 
 
 
@@ -16,4 +18,8 @@ def import_data(db):
     add_all(Chapter, CHAPTERS)
     add_all(Lesson, LESSONS)
     add_all(LearningObjective, OBJECTIVES)
+    add_all(Tag, TAGS)
+    db.session.commit()
+    for data in COURSE_TAG:
+        db.session.execute(CourseTag.insert().values(**data))
     db.session.commit()
