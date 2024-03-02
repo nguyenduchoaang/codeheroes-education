@@ -17,7 +17,8 @@ class GeneralController:
         if img is None:
             return jsonify(msg="Failed")
 
-        username = get_jwt_identity()
+        identity = get_jwt_identity()
+        username = identity["username"]
         path = os.path.join("static", "img", f"{username}_{int(time.time())}_{img.filename}")
         dest = os.path.join("src", path)
         img.save(dest)

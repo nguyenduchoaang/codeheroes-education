@@ -119,7 +119,8 @@ class LessonController:
     @staticmethod
     @jwt_required()
     def save_progress(uuid: str):
-        username = get_jwt_identity()
+        identity = get_jwt_identity()
+        username = identity["username"]
 
         user = db.session.execute(select(User).where(User.username == username)).first()
         if user is None:

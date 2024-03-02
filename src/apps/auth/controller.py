@@ -39,7 +39,12 @@ class AuthController:
         if user is None:
             return jsonify({"message": "Bad username or password"}), 400
 
-        access_token = create_access_token(identity=user[0].username)
+        identity = {
+            "username": user[0].username,
+            "avatar": user[0].avatar,
+            "role": user[0].role
+        }
+        access_token = create_access_token(identity=identity)
         return jsonify(access_token=access_token)
 
     @staticmethod

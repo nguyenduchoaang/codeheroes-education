@@ -12,7 +12,7 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from . import app, db
 
 
-class UserRole(enum.Enum):
+class UserRole(enum.IntEnum):
     ADMIN = 1
     USER = 2
 
@@ -20,15 +20,17 @@ class UserRole(enum.Enum):
 class Base(DeclarativeBase):
     __abstract__ = True
 
+    @abstractmethod
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        pass
 
 class BaseModel(Base):
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    @abstractmethod
     def as_dict(self, *attrs) -> dict[str, Any]:
-        pass
+        return { "id": self.id }
 
 
 class PostModel(BaseModel):
@@ -64,6 +66,12 @@ class Enrollment(Base):
 
     user: Mapped["User"] = relationship(back_populates="courses")
     course: Mapped["Course"] = relationship(back_populates="users")
+
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        data = {
+            "course_id": self.course_id
+        }
+        return data
 
 
 class Progress(Base):
@@ -180,6 +188,16 @@ class User(BaseModel):
 
     def __repr__(self) -> str:
         return f"User(id={self.id}, username={self.username})"
+
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        data = {
+            "username": self.username,
+            "email": self.email,
+            "name": self.name,
+            "avatar": self.avatar,
+            "phone": self.phone
+        }
+        return data
 
 
 class Choice(BaseModel):
@@ -303,8 +321,7 @@ class Course(BaseModel):
             "id": self.id,
             "name": self.name,
             "price": self.price,
-            "description": self.description,
-            "tags": self.tags
+            "tags": [tag.as_dict() for tag in self.tags]
         }
         for attr in attrs:
             match attr:
@@ -318,6 +335,8 @@ class Course(BaseModel):
                     data["users_count"] = len(self.users)
                 case "objectives":
                     data["objectives"] = [obj.name for obj in self.objectives]
+                case "description":
+                    data["description"] = self.description
         return data
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ class CourseController:
         course = db.session.execute(stmt).first()
         if course is None:
             return jsonify(msg="Course ID not exist"), 404
-        return jsonify(course[0].as_dict("chapters", "objectives")), 200
+        return jsonify(course[0].as_dict("chapters", "objectives", "description")), 200
 
     @staticmethod
     def create():
@@ -81,7 +81,8 @@ class CourseController:
             return jsonify(msg="Course ID not exist"), 404
 
         # Get user
-        username = get_jwt_identity()
+        identity = get_jwt_identity()
+        username = identity["username"]
         stmt = select(User).where(User.username == username)
         user = db.session.execute(stmt).first()
 
@@ -108,7 +109,8 @@ class CourseController:
     @staticmethod
     @jwt_required()
     def current_lesson(id: str):
-        username = get_jwt_identity()
+        identity = get_jwt_identity()
+        username = identity["username"]
         stmt = select(User).where(User.username == username)
         user = db.session.execute(stmt).first()
 
