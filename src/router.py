@@ -19,3 +19,6 @@ class Router:
 
         from .apps.lesson.routes import LessonRouter
         app.register_blueprint(LessonRouter)
+
+        from .apps.user.routes import UserRouter
+        app.register_blueprint(UserRouter)
