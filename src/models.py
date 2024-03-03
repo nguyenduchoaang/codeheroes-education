@@ -9,8 +9,6 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import Text
 from sqlalchemy.ext.orderinglist import ordering_list
 
-from . import app, db
-
 
 class UserRole(enum.IntEnum):
     ADMIN = 1
@@ -339,6 +337,9 @@ class Course(BaseModel):
         return data
 
 if __name__ == "__main__":
+    from . import app, db
+    from .import_data import import_data
+
     with app.app_context():
         print("Drop all")
         m = MetaData()
@@ -349,5 +350,4 @@ if __name__ == "__main__":
         Base.metadata.create_all(bind=db.engine)
 
         print("Importing data")
-        from .import_data import import_data
         import_data(db)

@@ -2,12 +2,15 @@ import os
 from urllib.parse import quote
 
 from flask import Flask
+from flask_admin.contrib.sqla import ModelView
 from flask_cors import CORS
+from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from dotenv import dotenv_values
 
 from .router import Router
+from .models import *
 
 config = dotenv_values(".env")
 
@@ -30,6 +33,12 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 
 db = SQLAlchemy(app=app)
 jwt = JWTManager(app=app)
+admin = Admin(app=app)
+
+models = [User, Course, Chapter, Lesson, Question, Choice, Comment, Blog, Tag, LearningObjective, Enrollment, Progress]
+admin.add_views(
+   *[ModelView(model, db.session) for model in models] 
+)
 
 Router(app)
 CORS(app)
