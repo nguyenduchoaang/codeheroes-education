@@ -170,7 +170,7 @@ class Comment(BaseModel):
 class User(BaseModel):
     __tablename__ = "user"
 
-    username = Column(String(20), unique=True)
+    username = Column(String(20), index=True, unique=True)
     password = Column(String(100))
     email = Column(String(255), unique=True)
     name = Column(String(100))
@@ -205,6 +205,7 @@ class Choice(BaseModel):
 
     content: Mapped[str] = mapped_column(String(255))
     is_correct: Mapped[bool] = mapped_column(default=False)
+    explanation = mapped_column(Text)
     question_id: Mapped[int] = mapped_column(ForeignKey("question.id", ondelete="CASCADE"))
 
     def __repr__(self) -> str:
@@ -219,7 +220,7 @@ class Choice(BaseModel):
             "id": self.id,
             "content": self.content,
             "is_correct": self.is_correct,
-            "question_id": self.question_id
+            "explanation": self.explanation
         }
         return data
 
@@ -229,7 +230,7 @@ class Question(BaseModel):
 
     content: Mapped[str] = mapped_column(String(255))
     score: Mapped[int] = mapped_column(default=1)
-    lession_id: Mapped[int] = mapped_column(ForeignKey("lesson.id", ondelete="CASCADE"))
+    lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id", ondelete="CASCADE"))
 
     choices: Mapped[List[Choice]] = relationship(backref="question", cascade="all, delete")
 
@@ -238,7 +239,6 @@ class Question(BaseModel):
             "id": self.id,
             "content": self.content,
             "score": self.score,
-            "lesson_id": self.lession_id,
             "choices": [choice.as_dict() for choice in self.choices]
         }
         return data
@@ -262,7 +262,6 @@ class Lesson(PostModel):
         data = {
             **super().as_dict(*attrs),
             "uuid": uuid.UUID(bytes=self.uuid),
-            "chapter_id": self.chapter_id,
             "questions": [question.as_dict() for question in self.questions]
         }
         return data
