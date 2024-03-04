@@ -79,6 +79,7 @@ class Progress(Base):
     lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id"), primary_key=True)
     course_id: Mapped[int] = mapped_column(ForeignKey("course.id"))
     completed: Mapped[bool] = mapped_column(default=False)
+    completed_at: Mapped[Optional[datetime]]
 
     user: Mapped["User"] = relationship(back_populates="lesson_progress")
     lesson: Mapped["Lesson"] = relationship(back_populates="user_progress")

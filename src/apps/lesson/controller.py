@@ -129,7 +129,8 @@ class LessonController:
         # Check lesson is completed
         stmt = text("""
             update progress
-            set completed = 1
+            set completed = 1,
+                completed_at = :time
             where user_id = :user_id
                 and lesson_id = (
                     select id
@@ -141,7 +142,8 @@ class LessonController:
         db.session.execute(stmt, {
             "user_id": user[0].id,
             "id": uuid,
-            "uuid": uuid_to_bin(uuid)
+            "uuid": uuid_to_bin(uuid),
+            "time": datetime.now()
         })
 
         # Add new track on next lesson
