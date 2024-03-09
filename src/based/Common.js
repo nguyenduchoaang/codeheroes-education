@@ -374,5 +374,10 @@ var Common = {
     tmp.innerHTML = html;
     return tmp.textContent || tmp.innerText || "";
   },
+  convertToMinutesAndSeconds(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds}`;
+  },
 };
 export default Common;

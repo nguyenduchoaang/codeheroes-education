@@ -99,7 +99,7 @@ const Bottom = styled.div`
   margin-top: 15%;
 `;
 
-const ConfigTitle = styled.h3`
+const ConfigTitle = styled.p`
   color: #242424;
   font-weight: 900;
   margin: 0.67em 0;
@@ -111,7 +111,7 @@ const TitleTop = styled(ConfigTitle)`
 
 const ContentTop = styled.div``;
 
-const ContentDetail = styled.h3`
+const ContentDetail = styled.p`
   margin: 6px 0;
   font-weight: unset;
 `;
@@ -156,7 +156,7 @@ const DetailsRight = styled.div`
   justify-content: center;
 `;
 
-const ContentCenter = styled.h3`
+const ContentCenter = styled.p`
   font-size: 14px;
   line-height: 1.6;
   margin: 0;
@@ -213,7 +213,7 @@ const TitleBottom = styled(ConfigTitle)`
   margin-bottom: 20px;
 `;
 
-const ContentBottom = styled.h3`
+const ContentBottom = styled.p`
   font-size: 14px;
   margin-bottom: 20px;
 `;

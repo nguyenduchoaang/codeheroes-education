@@ -1,8 +1,7 @@
 import styled from "styled-components";
-// import img_frontend_Blog from "../assets/frontend_Blog.png";
-// import img_backend_Blog from "../assets/backend_Blog.png";
-// import Blog_banner from "../assets/Blog_banner.png";
+
 import { BookMark, ThreeDot } from "../based/Icon";
+import { Link } from "react-router-dom";
 const listBlog = [
   {
     id: 1,
@@ -60,38 +59,42 @@ const Blog = () => {
           <Center>
             <LeftItem>
               {listBlog.map((item, index) => (
-                <Item>
-                  <HeaderItem>
-                    <ActionLeft>
-                      <AvtWrapper>
-                        <AvtUser src={item.createdBy.avt}></AvtUser>
-                      </AvtWrapper>
-                      <NameUser>{item.createdBy.name}</NameUser>
-                    </ActionLeft>
-                    <ActionRight>
-                      <ActionIcon>
-                        <BookMark active={true}></BookMark>
-                      </ActionIcon>
-                      <ActionIcon>
-                        <ThreeDot active={true}></ThreeDot>
-                      </ActionIcon>
-                    </ActionRight>
-                  </HeaderItem>
-                  <BodyItem>
-                    <LeftBodyItem>
-                      <TitleBlog>{item.title}</TitleBlog>
-                      <ContentBlog>{item.content}</ContentBlog>
-                      <SubItem>
-                        <TagBlog>{item.tag}</TagBlog>
-                        <ContentDetail>{item.timeCreated}</ContentDetail>
-                        <ContentDetail>{item.timeRead}</ContentDetail>
-                      </SubItem>
-                    </LeftBodyItem>
-                    <RightBodyItem>
-                      <ImgBlog src={item.img}></ImgBlog>
-                    </RightBodyItem>
-                  </BodyItem>
-                </Item>
+                <>
+                  <Link to={`/blog/${item.id}`}>
+                    <Item>
+                      <HeaderItem>
+                        <ActionLeft>
+                          <AvtWrapper>
+                            <AvtUser src={item.createdBy.avt}></AvtUser>
+                          </AvtWrapper>
+                          <NameUser>{item.createdBy.name}</NameUser>
+                        </ActionLeft>
+                        <ActionRight>
+                          <ActionIcon>
+                            <BookMark active={true}></BookMark>
+                          </ActionIcon>
+                          <ActionIcon>
+                            <ThreeDot active={true}></ThreeDot>
+                          </ActionIcon>
+                        </ActionRight>
+                      </HeaderItem>
+                      <BodyItem>
+                        <LeftBodyItem>
+                          <TitleBlog>{item.title}</TitleBlog>
+                          <ContentBlog>{item.content}</ContentBlog>
+                          <SubItem>
+                            <TagBlog>{item.tag}</TagBlog>
+                            <ContentDetail>{item.timeCreated}</ContentDetail>
+                            <ContentDetail>{item.timeRead}</ContentDetail>
+                          </SubItem>
+                        </LeftBodyItem>
+                        <RightBodyItem>
+                          <ImgBlog src={item.img}></ImgBlog>
+                        </RightBodyItem>
+                      </BodyItem>
+                    </Item>
+                  </Link>
+                </>
               ))}
             </LeftItem>
             <RightItem></RightItem>
@@ -114,7 +117,7 @@ const Center = styled.div`
   justify-content: space-between;
 `;
 
-const ConfigTitle = styled.h3`
+const ConfigTitle = styled.p`
   color: #242424;
   font-weight: 900;
   margin: 0.67em 0;
@@ -129,7 +132,7 @@ const ContentTop = styled.div``;
 const ContentDetail = styled.span`
   margin: 6px 0;
   font-weight: unset;
-  font-size:14px;
+  font-size: 14px;
 `;
 
 const BlogInner = styled.div`
@@ -145,7 +148,8 @@ const Item = styled.div`
   border: 2px solid #e8e8e8;
   border-radius: 16px;
   padding: 24px;
-  margin-bottom:3%;
+  cursor: pointer;
+  margin-bottom: 3%;
 `;
 
 const HeaderItem = styled.div`
@@ -156,15 +160,14 @@ const HeaderItem = styled.div`
 `;
 
 const BodyItem = styled.div`
-
-display: flex;
+  display: flex;
 `;
 const LeftBodyItem = styled.div`
-  width:70%;
+  width: 70%;
 `;
 
 const RightBodyItem = styled.div`
-  width:30%;
+  width: 30%;
 `;
 
 const AvtUser = styled.img`
@@ -180,7 +183,7 @@ const ActionLeft = styled.div`
   width: 80%;
 `;
 
-const NameUser = styled.h3`
+const NameUser = styled.p`
   color: #292929;
   font-size: 12px;
   font-weight: 600;
@@ -198,7 +201,7 @@ const ActionIcon = styled.div`
   width: 12px;
   height: 16px;
 `;
-const TitleBlog = styled.h3`
+const TitleBlog = styled.p`
   color: #292929;
   font-size: 20px;
   font-weight: 700;
@@ -207,41 +210,40 @@ const TitleBlog = styled.h3`
   margin-top: 8px;
 `;
 
-const ContentBlog = styled.h3`
+const ContentBlog = styled.p`
   color: #505050;
-    font-size: 15px;
-    line-height: 1.6;
-    margin-top: 4px;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-top: 4px;
 `;
 
 const TagBlog = styled.div`
-      background-color: #f2f2f2;
-    border-radius: 100px;
-    color: #333;
-    font-weight: 500;
-    line-height: 2rem;
-    margin-right: 12px;
-    padding: 4px 10px;
-
+  background-color: #f2f2f2;
+  border-radius: 100px;
+  color: #333;
+  font-weight: 500;
+  line-height: 2rem;
+  margin-right: 12px;
+  padding: 4px 10px;
 `;
 
 const ImgBlog = styled.img`
-      background: #ebebeb;
-    border-radius: 15px;
-    color: #757575;
-    display: block;
-    font-size: 1.4rem;
-    line-height: 1.8;
-    max-height: 120px;
-    object-fit: cover;
-    overflow: hidden;
-    text-align: center;
-    width: 200px;
+  background: #ebebeb;
+  border-radius: 15px;
+  color: #757575;
+  display: block;
+  font-size: 1.4rem;
+  line-height: 1.8;
+  max-height: 120px;
+  object-fit: cover;
+  overflow: hidden;
+  text-align: center;
+  width: 200px;
 `;
 
 const RecommendTopic = styled.div`
-  margin-top:8%;
-  margin-bottom:2%;
+  margin-top: 8%;
+  margin-bottom: 2%;
 `;
 
 const TitleRecommend = styled.div`
@@ -249,7 +251,7 @@ const TitleRecommend = styled.div`
   font-size: 14px;
   font-weight: 500;
   line-height: 1.8;
-  margin-bottom:2%;
+  margin-bottom: 2%;
   text-transform: uppercase;
 `;
 
@@ -263,10 +265,10 @@ const ListTopic = styled.ul`
 const Topic = styled.li``;
 
 const SubItem = styled.div`
-  display:flex;
-  align-items:center;
-  width:60%;
-  justify-content:space-between;
+  display: flex;
+  align-items: center;
+  width: 60%;
+  justify-content: space-between;
 `;
 const TopicLink = styled.a`
   background-color: #f2f2f2;

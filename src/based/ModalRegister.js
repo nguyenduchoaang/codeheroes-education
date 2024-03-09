@@ -74,9 +74,8 @@ const ModalRegister = ({ isOpen, onSave, onClose }) => {
 
           <RegisterAccount>
             <TitleRegister>Bạn chưa có tài khoản ?</TitleRegister>
-            <Link to="/register">
-              <ActionRegister>Đăng ký</ActionRegister>
-            </Link>
+
+            <ActionRegister>Đăng ký</ActionRegister>
           </RegisterAccount>
           <ItemBottom>
             Việc bạn tiếp tục sử dụng trang web này đồng nghĩa bạn đồng ý với{" "}

@@ -6,7 +6,8 @@ import { Link } from "react-router-dom";
 import { Tick, Play } from "../based/Icon";
 import ChapterServices from "../based/services/ChapterServices";
 import CourseServices from "../based/services/CousreServices";
-import UserServices from "../based/services/UserSevices";
+import UserServices from "../based/services/UserServices";
+import Common from "../based/Common";
 
 const course_detail = {
   title: "Kiến Thức Nhập Môn IT",
@@ -39,13 +40,10 @@ const DetailCourse = () => {
       console.log(err);
     }
   }
-  console.log(selectedChapter);
 
   useEffect(() => {
     GetDetailsChapterById();
   }, [selectedChapter]);
-
-  console.log("details", detailsChapter);
 
   async function GetcourseDetailsById(id) {
     const [err, data] = await CourseServices.GetCourseById(id);
@@ -72,6 +70,9 @@ const DetailCourse = () => {
   useEffect(() => {
     GetcourseDetailsById(id);
   }, [id]);
+
+  console.log("details chapter", detailsChapter);
+  console.log("course details", courseDetails);
 
   return (
     <DetailCourseWrapper>
@@ -125,17 +126,19 @@ const DetailCourse = () => {
               {courseDetails.chapters &&
                 courseDetails.chapters.map((d, i) => (
                   <>
-                    <LessonWrapper>
+                    <LessonWrapper key={i}>
                       <HeaderContent>
                         <ContentIL>
                           <IconL>-</IconL>
                         </ContentIL>
                         <ContentIR onClick={() => setSelectedChapter(d.id)}>
-                          <TitleR>{d.name}</TitleR>
+                          <TitleR>
+                            {i + 1}. {d.name}
+                          </TitleR>
                         </ContentIR>
                       </HeaderContent>
                       <ContentUl>
-                        {detailsChapter.course_id == d.id &&
+                        {detailsChapter.id == d.id &&
                           detailsChapter.lessons.map((l, i) => (
                             <ContentLi key={i}>
                               <ItemLiLeft>
@@ -143,9 +146,11 @@ const DetailCourse = () => {
                                   {" "}
                                   <Play active={true} />
                                 </IconPlayWrapper>
-                                <TitleLi>{l.content}</TitleLi>
+                                <TitleLi>{l.title}</TitleLi>
                               </ItemLiLeft>
-                              <ItemLiRight>{l.duration}</ItemLiRight>
+                              <ItemLiRight>
+                                {Common.convertToMinutesAndSeconds(l.duration)}
+                              </ItemLiRight>
                             </ContentLi>
                           ))}
                       </ContentUl>
@@ -181,10 +186,6 @@ const DetailCourseInner = styled.div`
   display: flex;
   margin: 0 auto;
 `;
-const ImgCourse = styled.img``;
-const Title = styled.h3``;
-const Price = styled.div``;
-const SalePrice = styled.span``;
 
 const Header = styled.div``;
 
@@ -200,7 +201,7 @@ const SubHeader = styled.div`
   margin-top: 20px;
 `;
 
-const SubHeaderTitle = styled.h3``;
+const SubHeaderTitle = styled.p``;
 
 const Experience = styled.div`
   margin-top: 20px;
@@ -262,7 +263,7 @@ const SubItemTitle = styled.span`
   margin-right: 5px;
 `;
 
-const RTitle = styled.h3`
+const RTitle = styled.p`
   margin-right: 20px;
 `;
 
@@ -292,18 +293,28 @@ const ContentLi = styled.li`
 
 const ContentIL = styled.div`
   margin-right: 10px;
+  position: relative;
+  padding-left: 5%;
 `;
-const IconL = styled.div``;
+const IconL = styled.div`
+  color: #f05123;
+  font-size: 40px;
+  position: absolute;
+  bottom: -10px;
+`;
 
 const ContentIR = styled.div``;
 
-const TitleR = styled.h3``;
+const TitleR = styled.p`
+  margin-left: 16px;
+`;
 
 const LessonWrapper = styled.div`
   margin-bottom: 8px;
+  cursor: pointer;
 `;
 
-const TitleLi = styled.h3``;
+const TitleLi = styled.p``;
 const IconPlayWrapper = styled.div`
   width: 15px;
   display: flex;
@@ -316,7 +327,7 @@ const ItemLiLeft = styled.div`
   align-items: center;
 `;
 
-const ItemLiRight = styled.h3``;
+const ItemLiRight = styled.p``;
 
 const DCLeft = styled.div`
   width: 70%;
@@ -344,7 +355,7 @@ const DCRContent = styled.div`
   align-items: center;
 `;
 
-const DCRTitle = styled.h3``;
+const DCRTitle = styled.p``;
 
 const DCRButton = styled.button`
   font-size: 16px;

@@ -1,14 +1,27 @@
 import styled from "styled-components";
-import BannerCodeheroes from "../assets/BannerCodeHeroes.png";
+import BannderCodeHeroes from "../assets/banner1.png";
+import BannderCodeHeroes2 from "../assets/banner2.png";
+import BannderCodeHeroes3 from "../assets/banner3.png";
 import course1 from "../assets/anh1.png";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CourseServices from "../based/services/CousreServices";
 import useStore from "../based/store/useStore";
+import { UserCount } from "../based/Icon";
+
+const colors = ["", "", ""];
+const delay = 2500;
+const banner = {
+  1: BannderCodeHeroes,
+  2: BannderCodeHeroes2,
+  3: BannderCodeHeroes3,
+};
 
 const Homepage = () => {
   const [listCourse, setListCourse] = useState([]);
   const [state, dispatch] = useStore();
+  const [index, setIndex] = useState(0);
+  const timeoutRef = useRef(null);
   async function GetAllCourse() {
     const [err, data] = await CourseServices.GetAllCourse();
     if (!err) setListCourse(data);
@@ -18,45 +31,58 @@ const Homepage = () => {
   useEffect(() => {
     GetAllCourse();
   }, []);
-  const handleFileChange = (e) => {
-    e.preventDefault();
-    let reader = new FileReader();
-    let file = e.target.files[0];
-    if (file) {
-      //  reader.onloadend = () => {
-      //    Request.UploadStockPhoto(file)
-      //      .then((res) => {
-      //        if (res && res.data) {
-      //          setThumbnail(res.data.imageUrl);
-      //        } else {
-      //          let errMsg =
-      //            res.errors && res.errors.length > 0
-      //              ? res.errors.reduce((prev, item, idx) => {
-      //                  return `${prev}${item.value}<br/>`;
-      //                }, "")
-      //              : "" || CONSTANTS.MSG_ERROR;
-      //          Notify(NOTIFY.ERROR, NOTIFY.ERROR, errMsg);
-      //        }
-      //        setLoading(false);
-      //      })
-      //      .catch((err) => {
-      //        setLoading(false);
-      //      });
-      //  };
-      console.log(file);
 
-      reader.readAsDataURL(file);
+  function resetTimeout() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
-  };
+  }
+
+  useEffect(() => {
+    resetTimeout();
+    timeoutRef.current = setTimeout(
+      () =>
+        setIndex((prevIndex) =>
+          prevIndex === colors.length - 1 ? 0 : prevIndex + 1
+        ),
+      delay
+    );
+
+    return () => {
+      resetTimeout();
+    };
+  }, [index]);
 
   return (
     <>
       <HomeWrapper>
         <HomeTop>
-          <input type="file" onChange={handleFileChange} />
-          <Banner>
-            <ImgBanner src={BannerCodeheroes}></ImgBanner>
-          </Banner>
+          {/* <input type="file" onChange={handleFileChange} /> */}
+          <div className="slideshow">
+            <div
+              className="slideshowSlider"
+              style={{ transform: `translate3d(${-index * 100}%, 0, 0)` }}
+            >
+              {colors.map((backgroundColor, index) => (
+                <div className="slide" key={index} style={{ backgroundColor }}>
+                  <ImgBanner src={banner[index + 1]}></ImgBanner>
+                </div>
+              ))}
+            </div>
+
+            <div className="slideshowDots">
+              {colors.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`slideshowDot${index === idx ? " active" : ""}`}
+                  onClick={() => {
+                    setIndex(idx);
+                  }}
+                ></div>
+              ))}
+            </div>
+          </div>
+          <Banner></Banner>
         </HomeTop>
         <HomeCenter>
           <ProCourse>
@@ -73,12 +99,18 @@ const Homepage = () => {
                             <ButtonModal>Xem khóa học</ButtonModal>
                           </Link>
                         </ModalShowCourse>
-                        <ImgCourse src={course1} alt="#"></ImgCourse>
+                        <ImgCourse
+                          src={`http://localhost:5000/${item.img_url}`}
+                          alt="#"
+                        ></ImgCourse>
                       </ImgWrapper>
                       <TitleCourse>{item.name}</TitleCourse>
                       <PriceWrapper>
-                        <Price>{item.price} đ</Price>
-                        {/* <SalePrice>{item.sale_price} đ</SalePrice> */}
+                        {/* <Price>{item.price} đ</Price> */}
+                        <UserCountWrapper>
+                          <UserCount />
+                          <p>{item.users_count}</p>
+                        </UserCountWrapper>
                       </PriceWrapper>
                     </Item>
                   </>
@@ -100,6 +132,7 @@ const HomeWrapper = styled.div`
 
 const HomeTop = styled.div`
   width: 100%;
+  margin-top: 20px;
 `;
 
 const Banner = styled.div`
@@ -115,19 +148,19 @@ const HomeCenter = styled.div`
 `;
 
 const ImgBanner = styled.img`
-  width: 90%;
+  width: 100%;
+  border-radius: 16px;
 `;
 
 const ProCourse = styled.div``;
 
-const Title = styled.h3``;
+const Title = styled.p``;
 
 const CourseWrapper = styled.div`
   width: 100%;
   display: flex;
   padding: 12px;
   flex-wrap: wrap;
-  justify-content: space-between;
 `;
 const Item = styled.div`
   width: 25%;
@@ -138,19 +171,19 @@ const ImgCourse = styled.img`
   height: 100%;
 `;
 
-const TitleCourse = styled.h3`
+const TitleCourse = styled.p`
   color: #292929;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.4;
   overflow: hidden;
 `;
 
-const PriceWrapper = styled.h3`
+const PriceWrapper = styled.p`
   display: flex;
   align-items: center;
 `;
 
-const Price = styled.h3`
+const Price = styled.p`
   font-family: '"Honk", system-ui;';
   margin-right: 10px;
   font-size: 14px;
@@ -158,7 +191,7 @@ const Price = styled.h3`
   text-decoration: line-through;
 `;
 
-const SalePrice = styled.h3`
+const SalePrice = styled.p`
   color: #f05123;
   font-family: '"Honk", system-ui;';
   font-size: 14px;
@@ -208,5 +241,13 @@ const ImgWrapper = styled.div`
   &:hover ${ButtonModal} {
     opacity: 1;
     visibility: visible;
+  }
+`;
+
+const UserCountWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  p {
+    margin-left: 12px;
   }
 `;

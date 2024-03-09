@@ -3,7 +3,7 @@ import styled from "styled-components";
 import ModalLogin from "./ModalLogin";
 import ModalRegister from "./ModalRegister";
 import useStore from "./store/useStore";
-import { Bell } from "./Icon";
+import { Bell, Search } from "./Icon";
 const Header = () => {
   const [isOpenModalLogin, setIsOpenModalLogin] = useState(false);
   const [isOpenModalRegister, setIsOpenModalRegister] = useState(false);
@@ -57,6 +57,13 @@ const Header = () => {
         onSave={handleSaveModalRegister}
       />
       <HeaderWrapper>
+        <TempWrapper></TempWrapper>
+        <SearchInputWrapper>
+          <SearchIcon>
+            <Search />
+          </SearchIcon>
+          <InputSearch placeholder="Tìm kiếm khóa học ,bài viết, video,..."></InputSearch>
+        </SearchInputWrapper>
         <ActionHeaderWrapper>
           {userInfo.username ? (
             <>
@@ -98,7 +105,7 @@ const HeaderWrapper = styled.div`
   display: flex;
   flex-direction: row;
   -webkit-box-pack: end;
-  justify-content: flex-end;
+  justify-content: space-between;
   -webkit-box-align: center;
   align-items: center;
   padding: 0px 15px;
@@ -149,4 +156,29 @@ const UserInfoWrapper = styled.div`
 const IconBell = styled.div`
   width: 18px;
   height: 20px;
+`;
+
+const SearchInputWrapper = styled.div`
+  border: 2px solid #e8e8e8;
+  height: 40px;
+  position: relative;
+  border-radius: 20px;
+  width: 420px;
+`;
+
+const InputSearch = styled.input`
+  border: none;
+  width: 100%;
+  border-radius: 20px;
+  height: 100%;
+  outline: none;
+  padding: 0x 10px;
+  padding-left: 40px;
+`;
+const TempWrapper = styled.div``;
+const SearchIcon = styled.div`
+  position: absolute;
+  top: 8px;
+  width: 12px;
+  left: 10px;
 `;

@@ -32,7 +32,7 @@ const Body = styled.div`
   position: absolute;
   top: 70px;
   right: 0px;
-  width: calc(100% - 13%);
+  width: calc(100% - 10%);
   height: calc(-70px + 100vh);
   transition: width 0.6s ease 0s;
   display: flex;

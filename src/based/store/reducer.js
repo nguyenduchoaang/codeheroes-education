@@ -2,6 +2,7 @@ const initState = {
   userInfo: {
     username: "",
   },
+  listCourse: [],
 };
 
 function reducer(state, action) {

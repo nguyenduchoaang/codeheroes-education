@@ -4,6 +4,9 @@ import Road from "./roadpage/Road";
 import Blog from "./blogpage/Blog";
 import DetailCourse from "./detailcousre/DetailCourse";
 import Lesson from "./lesson/Lesson";
+import DetailBlog from "./blogpage/DetailBlog";
+import EmptyLayout from "./based/EmptyLayout";
+import CreateBlog from "./blogpage/CreateBlog";
 const AppRoutes = [
   {
     path: "/",
@@ -28,6 +31,17 @@ const AppRoutes = [
   {
     path: "/lesson/:id",
     element: <Lesson />,
+    layout: EmptyLayout,
+  },
+  {
+    path: "/blog/:id",
+    element: <DetailBlog />,
+    layout: DefaultLayout,
+  },
+  {
+    path: "/create-blog",
+    element: <CreateBlog />,
+    layout: DefaultLayout,
   },
 ];
 
