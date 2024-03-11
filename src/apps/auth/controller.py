@@ -40,6 +40,7 @@ class AuthController:
             return jsonify({"message": "Bad username or password"}), 400
 
         identity = {
+            "id": user[0].id,
             "username": user[0].username,
             "avatar": user[0].avatar,
             "role": user[0].role
