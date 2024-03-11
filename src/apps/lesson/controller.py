@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy import delete, select, text, update
+from sqlalchemy import and_, delete, or_, select, text, update
 
 from src import db
 from src.models import Chapter, Comment, Lesson, Progress, User
@@ -214,3 +214,28 @@ class LessonController:
         db.session.add(comment)
         db.session.commit()
         return jsonify(msg="Create Comment successfully"), 200
+
+    @staticmethod
+    @jwt_required()
+    def delete_comment(uuid: str, comment_id: int):
+        identity = get_jwt_identity()
+        stmt = delete(Comment).where(or_(
+            and_(Comment.id == comment_id, Comment.user_id == identity["id"]),
+            Comment.parent_id == comment_id
+        ))
+        db.session.execute(stmt)
+        db.session.commit()
+        return jsonify(msg="Delete Comment successfully"), 200
+
+    @staticmethod
+    @jwt_required()
+    def update_comment(uuid: str, comment_id: int):
+        identity = get_jwt_identity()
+        data = request.get_json()
+        content = data.get("content", "")
+        stmt = update(Comment) \
+            .where(and_(Comment.id == comment_id, Comment.user_id == identity["id"])) \
+            .values(content=content)
+        db.session.execute(stmt)
+        db.session.commit()
+        return jsonify(msg="Update Comment successfully"), 200

@@ -12,4 +12,6 @@ LessonRouter.route("/<string:uuid>/", methods=["DELETE"])(LessonController.delet
 LessonRouter.route("/<string:uuid>/save-progress/", methods=["POST"])(LessonController.save_progress)
 LessonRouter.route("/<string:uuid>/comments/", methods=["GET"])(LessonController.all_comments)
 LessonRouter.route("/<string:uuid>/comments/", methods=["POST"])(LessonController.create_comment)
+LessonRouter.route("/<string:uuid>/comments/<int:comment_id>/", methods=["DELETE"])(LessonController.delete_comment)
+LessonRouter.route("/<string:uuid>/comments/<int:comment_id>/", methods=["PATCH"])(LessonController.update_comment)
 
