@@ -163,8 +163,29 @@ class Comment(BaseModel):
     parent_id: Mapped[Optional[int]] = mapped_column(index=True)
     create_time: Mapped[datetime]
 
-    # user_reactions: Mapped[List["User"]] = relationship(secondary=Reaction, back_populates="comments")
     user: Mapped["User"] = relationship(back_populates="comments")
+
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        data = {
+            "id": self.id,
+            "content": self.content,
+            "user": self.user.as_dict(),
+            "parent_id": self.parent_id,
+            "create_time": self.create_time
+        }
+        return data
+
+
+class BlogComment(BaseModel):
+    __tablename__ = "blog_comment"
+
+    content = mapped_column(Text, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    blog_id: Mapped[int] = mapped_column(ForeignKey("blog.id"))
+    parent_id: Mapped[Optional[int]] = mapped_column(index=True)
+    create_time: Mapped[datetime]
+
+    user: Mapped["User"] = relationship(back_populates="blog_comments")
 
     def as_dict(self, *attrs) -> dict[str, Any]:
         data = {
@@ -193,7 +214,7 @@ class User(BaseModel):
     blogs: Mapped[List[Blog]] = relationship(backref="user")
     courses: Mapped[List[Enrollment]] = relationship(back_populates="user")
     comments: Mapped[List[Comment]] = relationship(back_populates="user")
-
+    blog_comments: Mapped[List[BlogComment]] = relationship(back_populates="user")
     lesson_progress: Mapped[List[Progress]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:

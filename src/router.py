@@ -22,3 +22,6 @@ class Router:
 
         from .apps.user.routes import UserRouter
         app.register_blueprint(UserRouter)
+
+        from .apps.blog.routes import BlogRouter
+        app.register_blueprint(BlogRouter)
