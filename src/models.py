@@ -160,15 +160,17 @@ class Comment(BaseModel):
     content = mapped_column(Text, nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id"))
-    parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey("comment.id"), index=True)
+    parent_id: Mapped[Optional[int]] = mapped_column(index=True)
     create_time: Mapped[datetime]
 
     # user_reactions: Mapped[List["User"]] = relationship(secondary=Reaction, back_populates="comments")
+    user: Mapped["User"] = relationship(back_populates="comments")
 
     def as_dict(self, *attrs) -> dict[str, Any]:
         data = {
             "id": self.id,
             "content": self.content,
+            "user": self.user.as_dict(),
             "parent_id": self.parent_id,
             "create_time": self.create_time
         }
@@ -190,8 +192,7 @@ class User(BaseModel):
 
     blogs: Mapped[List[Blog]] = relationship(backref="user")
     courses: Mapped[List[Enrollment]] = relationship(back_populates="user")
-    # comments: Mapped[List[Comment]] = relationship(secondary=Reaction, back_populates="user_reactions")
-    comments: Mapped[List[Comment]] = relationship(backref="user")
+    comments: Mapped[List[Comment]] = relationship(back_populates="user")
 
     lesson_progress: Mapped[List[Progress]] = relationship(back_populates="user")
 
@@ -204,7 +205,8 @@ class User(BaseModel):
             "email": self.email,
             "name": self.name,
             "avatar": self.avatar,
-            "phone": self.phone
+            "phone": self.phone,
+            "role": self.role
         }
         return data
 
