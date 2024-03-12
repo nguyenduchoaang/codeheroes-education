@@ -6,7 +6,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import and_, delete, or_, select, text, update
 
 from src import db
-from src.models import Chapter, Comment, Lesson, Progress, User
+from src.models import Chapter, Comment, Lesson, Progress, ProgressScore, User
 from src.utils.uuid import bin_to_uuid, uuid_to_bin, is_valid_uuid
 
 
@@ -200,16 +200,13 @@ class LessonController:
             return jsonify(msg="Lesson ID does not exist")
 
         identity = get_jwt_identity()
-        user = db.session.execute(select(User).where(User.username == identity["username"])).first()
-        if user is None:
-            return jsonify(msg="User does not exist")
 
         data = request.get_json()
         content = data.get("content", "")
         parent_id = data.get("parent_id", None)
 
         comment = Comment(content=content, parent_id=parent_id,
-                          user_id=user[0].id, lesson_id=lesson[0].id,
+                          user_id=identity["id"], lesson_id=lesson[0].id,
                           create_time=datetime.now())
         db.session.add(comment)
         db.session.commit()
@@ -239,3 +236,26 @@ class LessonController:
         db.session.execute(stmt)
         db.session.commit()
         return jsonify(msg="Update Comment successfully"), 200
+
+    @staticmethod
+    @jwt_required()
+    def submit(uuid: str):
+        identity = get_jwt_identity()
+
+        try:
+            stmt = LessonController.__add_conditional_statement(select(Lesson), uuid)
+        except ValueError:
+            return jsonify({"message": "Lesson ID is invalid"})
+
+        lesson = db.session.execute(stmt).first()
+        if lesson is None:
+            return jsonify({"message": "Lesson ID does not exist"})
+
+        data = request.get_json()
+        score = data.get("score", 0)
+
+        ProgressScore(user_id=identity["id"], lesson_id=lesson[0].id,
+                      score=score, completed_at=datetime.now())
+
+        db.session.commit()
+        return jsonify(msg="Submit successfully"), 200

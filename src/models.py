@@ -85,6 +85,24 @@ class Progress(Base):
     lesson: Mapped["Lesson"] = relationship(back_populates="user_progress")
 
 
+class ProgressScore(Base):
+    __tablename__ = "tracking"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id"), primary_key=True)
+    score: Mapped[int]
+    completed_at: Mapped[datetime] = mapped_column(primary_key=True)
+
+    user: Mapped["User"] = relationship(back_populates="lesson_tracking")
+    lesson: Mapped["Lesson"] = relationship(back_populates="user_tracking")
+
+    def as_dict(self, *attrs) -> dict[str, Any]:
+        return {
+            "score": self.score,
+            "completed_at": self.completed_at
+        }
+
+
 Reaction = Table(
     "reaction",
     Base.metadata,
