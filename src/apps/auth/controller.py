@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from flask import jsonify, request
 from sqlalchemy import select
 from flask_jwt_extended import create_access_token
@@ -45,7 +47,7 @@ class AuthController:
             "avatar": user[0].avatar,
             "role": user[0].role
         }
-        access_token = create_access_token(identity=identity)
+        access_token = create_access_token(identity=identity, expires_delta=timedelta(days=30))
         return jsonify(access_token=access_token)
 
     @staticmethod
