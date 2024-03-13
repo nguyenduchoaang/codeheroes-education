@@ -234,6 +234,7 @@ class User(BaseModel):
     comments: Mapped[List[Comment]] = relationship(back_populates="user")
     blog_comments: Mapped[List[BlogComment]] = relationship(back_populates="user")
     lesson_progress: Mapped[List[Progress]] = relationship(back_populates="user")
+    lesson_tracking: Mapped[List[ProgressScore]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
         return f"User(id={self.id}, username={self.username})"
@@ -304,6 +305,7 @@ class Lesson(PostModel):
     questions: Mapped[List[Question]] = relationship(backref="lesson", cascade="all, delete")
     user_progress: Mapped[List[Progress]] = relationship(back_populates="lesson")
     comments: Mapped[List[Comment]] = relationship(backref="lesson")
+    user_tracking: Mapped[List[ProgressScore]] = relationship(back_populates="lesson")
 
 
     def __repr__(self) -> str:
