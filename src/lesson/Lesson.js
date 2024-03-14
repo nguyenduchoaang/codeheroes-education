@@ -5,16 +5,20 @@ import { Play } from "../based/Icon";
 import CourseServices from "../based/services/CousreServices";
 import ChapterServices from "../based/services/ChapterServices";
 import Common from "../based/Common";
-import { ArrowUpDown } from "../based/Icon";
+import { ArrowUpDown, QALesson } from "../based/Icon";
 import ModalAnswerQuestion from "./ModalAnswerQuestion";
 import ModalComment from "./ModalComment";
-
+import LessonServices from "../based/services/LessonServices";
 const Lesson = () => {
   const { id } = useParams();
   const [courseDetails, setCourseDetails] = useState({});
   const [detailsChapter, setDetailsChapter] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState();
   const [videoUrl, setVideoUrl] = useState();
+  const [selectedLesson, setSelectedLesson] = useState();
+  const [dataQuestionSelectedLesson, setDataQuestionSelectedLesson] = useState(
+    []
+  );
 
   const [isOpenModalAnswerQuestion, setIsOpenModalAnswerQuestion] =
     useState(false);
@@ -44,9 +48,6 @@ const Lesson = () => {
     setIsOpenModalComment(false);
   };
 
-  console.log("course", courseDetails);
-  console.log("chapter", detailsChapter);
-
   async function GetDetailsChapterById() {
     const [err, data] = await ChapterServices.GetDetailsChapterById(
       selectedChapter
@@ -66,14 +67,29 @@ const Lesson = () => {
       console.log(err);
     }
   }
+  async function GetLessonById(id) {
+    const [err, data] = await LessonServices.GetLessonById(id);
+    if (!err && data) {
+      setDataQuestionSelectedLesson(data.questions);
+    } else {
+      console.log(err);
+    }
+  }
 
   useEffect(() => {
     GetDetailsChapterById();
   }, [selectedChapter]);
 
   useEffect(() => {
+    GetLessonById(selectedLesson);
+  }, [selectedLesson]);
+
+  useEffect(() => {
     GetcourseDetailsById(id);
+    // GetLessonById();
   }, [id]);
+
+  console.log(selectedLesson);
 
   return (
     <LessonWrapper>
@@ -81,12 +97,14 @@ const Lesson = () => {
         isOpen={isOpenModalAnswerQuestion}
         onClose={handleCloseModalAnswerQuestion}
         onSave={handleSaveModalAnswerQuestion}
+        dataQuestion={dataQuestionSelectedLesson}
       />
 
       <ModalComment
         isOpen={isOpenModalComment}
         onClose={handleCloseModalComment}
         onSave={handleSaveModalComment}
+        lessonsSelected={selectedLesson}
       />
 
       <Header>
@@ -131,7 +149,15 @@ const Lesson = () => {
                       {detailsChapter.id == d.id &&
                         detailsChapter.lessons.map((l, i) => (
                           <ContentLi
-                            onClick={() => setVideoUrl(l.video_url)}
+                            bg={
+                              selectedLesson === l.id
+                                ? "rgba(240, 81, 35, 0.2)"
+                                : ""
+                            }
+                            onClick={() => {
+                              setSelectedLesson(l.id);
+                              setVideoUrl(l.video_url);
+                            }}
                             key={i}
                           >
                             <ItemLiLeft>
@@ -168,10 +194,23 @@ const Lesson = () => {
             <DTitle>
               <p>Mô hình Client - Server là gì?</p>
               <ButtonAnswerWrapper>
-                <ButtonAnswer onClick={() => setIsOpenModalComment(true)}>
+                <ButtonAnswer2 onClick={() => setIsOpenModalComment(true)}>
+                  <QALesson />
                   Hỏi đáp
-                </ButtonAnswer>
+                </ButtonAnswer2>
                 <ButtonAnswer
+                  disabled={
+                    dataQuestionSelectedLesson &&
+                    dataQuestionSelectedLesson.length > 0
+                      ? false
+                      : true
+                  }
+                  color={
+                    dataQuestionSelectedLesson &&
+                    dataQuestionSelectedLesson.length > 0
+                      ? "#e27252"
+                      : "#b1b0b0"
+                  }
                   onClick={() => setIsOpenModalAnswerQuestion(true)}
                 >
                   Trả lời câu hỏi
@@ -201,6 +240,7 @@ export default Lesson;
 const LessonWrapper = styled.div`
   width: 100%;
   height: auto;
+  overflow: hidden;
 `;
 
 const Header = styled.div`
@@ -208,6 +248,7 @@ const Header = styled.div`
   height: 50px;
   position: fixed;
   align-items: center;
+  overflow: hidden;
   display: flex;
   background-color: #313a46;
   justify-content: space-between;
@@ -217,11 +258,12 @@ const Body = styled.div`
   width: 100%;
   display: flex;
   height: 100vh;
+  overflow: hidden;
 `;
 
 const LeftItem = styled.div`
   width: 80%;
-  overflow-y: scroll;
+  overflow-y: hidden;
 
   height: 100%;
   margin-top: 50px;
@@ -301,7 +343,7 @@ const ContentUl = styled.ul`
 const ContentLi = styled.li`
   cursor: pointer;
   padding: 8px 12px;
-  background-color: #f7f8fa;
+  background-color: ${(props) => (props.bg ? props.bg : " #f7f8fa")};
   transition: all 0.3s ease-in-out;
   &:hover {
     background: rgba(240, 81, 35, 0.2);
@@ -414,13 +456,28 @@ const ButtonAnswerWrapper = styled.div``;
 const ButtonAnswer = styled.button`
   border: 2px solid;
 
-  background-color: #e27252;
+  background-color: ${(props) => props.color};
 
   border-radius: 6px;
   padding: 10px 20px;
   color: white;
   cursor: pointer;
-  &:hover {
+  /* &:hover {
     background-color: #f05123;
-  }
+  } */
+`;
+const ButtonAnswer2 = styled.button`
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: #f05123;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 7%;
+  outline: none;
+  border: none;
+  right: 5%;
 `;

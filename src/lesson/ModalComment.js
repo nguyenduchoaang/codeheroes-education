@@ -1,41 +1,78 @@
 import styled, { keyframes } from "styled-components";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import cookie from "react-cookies";
-import { ArrowLeft, ArrowUpDown, Cancel, Check } from "../based/Icon";
-
-const ModalComment = ({ isOpen, onSave, onClose }) => {
-  const [commentOfUser, setCommentOfUser] = useState("");
+import { ArrowLeft, ArrowUpDown, Cancel } from "../based/Icon";
+import LessonServices from "../based/services/LessonServices";
+const ModalComment = ({ isOpen, onSave, onClose, lessonsSelected }) => {
+  const [selectedLesson, setSelectedLesson] = useState();
   const [showCommentById, setShowCommentById] = useState(null);
-  const [listComment, setListComment] = useState([
-    {
-      id: 1,
-      content: "Bài viết hay",
-      lesson_id: 1,
-      parent_id: null,
-      create_time: "2021-10-10",
-    },
-    {
-      id: 2,
-      lesson_id: 1,
-      parent_id: 2,
-      content: "Bài viết hay",
-      create_time: "2021-10-10",
-    },
-  ]);
-  console.log("comment", commentOfUser);
+  const [comment, setComment] = useState({
+    content: "",
+  });
 
-  const handleButtonComment = () => {
-    console.log("comment", commentOfUser);
-    setListComment([
-      ...listComment,
-      {
-        id: 1,
-        content: commentOfUser,
-        lesson_id: 1,
-        parent_id: null,
-        create_time: "2021-10-10",
-      },
-    ]);
+  console.log("123");
+
+  const [reply, setReply] = useState({
+    content: "",
+    parent_id: 0,
+  });
+  const [listComment, setListComment] = useState([]);
+  const [listReplyComment, setListReplyComment] = useState([]);
+  const [showReplyById, setShowReplyById] = useState(null);
+
+  useEffect(() => {
+    setSelectedLesson(lessonsSelected);
+    async function fetchData() {
+      await handleGetAllCommentOfLesson(lessonsSelected);
+    }
+
+    fetchData();
+  }, [isOpen, selectedLesson]);
+
+  async function handleGetAllCommentOfLesson(id) {
+    const [err, data] = await LessonServices.GetAllCommentLesson(id);
+    if (!err && data) {
+      setListComment(data);
+      const listReplyComment = data.filter((item) => item.parent_id !== null);
+      setListReplyComment(listReplyComment);
+    } else {
+      console.log(err);
+    }
+  }
+
+  async function CommentLesson(id, comment) {
+    const [err, data] = await LessonServices.CommentLesson(id, comment);
+    if (!err && data) {
+      console.log("comment ne", data);
+      setComment({ content: "" });
+    } else {
+      console.log(err);
+    }
+  }
+  const handleButtonComment = async () => {
+    setListComment([...listComment, comment]);
+    await CommentLesson(selectedLesson, comment);
+  };
+
+  const handleButtonReply = () => {
+    console.log("123");
+  };
+
+  console.log("rreply", reply);
+
+  const handleButtonReplyComment = async () => {
+    const [err, data] = await LessonServices.CommentLesson(
+      selectedLesson,
+      reply
+    );
+    if (!err && data) {
+      console.log("comment ne", data);
+      setShowReplyById(null);
+      handleGetAllCommentOfLesson(selectedLesson);
+    } else {
+      console.log(err);
+    }
   };
 
   return (
@@ -51,7 +88,7 @@ const ModalComment = ({ isOpen, onSave, onClose }) => {
           <HeaderWarning></HeaderWarning>
         </Header>
         <CommentWrapper2>
-          <SubComment>147 bình luận</SubComment>
+          <SubComment>{listComment.length} bình luận</SubComment>
           <SubComment2>
             (Hãy bình luận và tạo ra 1 cộng đồng văn minh, lịch sự nhé!)
           </SubComment2>
@@ -65,7 +102,10 @@ const ModalComment = ({ isOpen, onSave, onClose }) => {
           <InputUserWrapper>
             {" "}
             <InputUserComment
-              onChange={(e) => setCommentOfUser(e.target.value)}
+              value={comment.content}
+              onChange={(e) => {
+                setComment({ content: e.target.value });
+              }}
               placeholder="Nhập bình luận của bạn..."
             ></InputUserComment>
           </InputUserWrapper>
@@ -87,58 +127,150 @@ const ModalComment = ({ isOpen, onSave, onClose }) => {
         <Body>
           <QAWrapper>
             <ListAnswerWrapper>
-              <CommentWrapper>
-                <LeftComment>
-                  <UserAvatar
-                    src={
-                      "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg"
-                    }
-                  ></UserAvatar>
-                </LeftComment>
-                <RightContentWrapper>
-                  <RightComment>
-                    <NameUserComment>User1</NameUserComment>
-                    <ContentComment>Bài viết hay</ContentComment>
-                  </RightComment>
-                  <ActionForComment>
-                    <ActionLike>Thích</ActionLike>
-                    <ActionReply>Trả lời</ActionReply>
-                    <TimeReply>20 ngày trước</TimeReply>
-                  </ActionForComment>
+              {listComment &&
+                listComment.length > 0 &&
+                listComment
+                  .filter((itemFilter) => itemFilter.parent_id == null)
+                  .map((item, index) => {
+                    return (
+                      <>
+                        <CommentWrapper>
+                          <LeftComment>
+                            <UserAvatar
+                              src={
+                                "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg"
+                              }
+                            ></UserAvatar>
+                          </LeftComment>
 
-                  <DisplaySubComment onClick={() => setShowCommentById(1)}>
-                    <ContentDisplay>Hiển thị câu trả lời</ContentDisplay>
-                    <ArrowUpDown
-                      active={showCommentById === 1 ? true : false}
-                    />
-                  </DisplaySubComment>
-                  {/* --- Comment Reply --- */}
-                  <SubCommentOfComment
-                    display={showCommentById === 1 ? "block" : "none"}
-                  >
-                    <CommentWrapper>
-                      <LeftComment>
-                        <UserAvatar
-                          src={
-                            "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg"
-                          }
-                        ></UserAvatar>
-                      </LeftComment>
-                      <RightContentWrapper>
-                        <RightComment>
-                          <NameUserComment>User1</NameUserComment>
-                          <ContentComment>Bài viết hay</ContentComment>
-                        </RightComment>
-                        <ActionForComment>
-                          <ActionLike>Thích</ActionLike>
-                          <ActionReply>Trả lời</ActionReply>
-                          <TimeReply>20 ngày trước</TimeReply>
-                        </ActionForComment>
-                      </RightContentWrapper>
-                    </CommentWrapper>
-                  </SubCommentOfComment>
-                </RightContentWrapper>
-              </CommentWrapper>
+                          <RightContentWrapper>
+                            <RightComment>
+                              <NameUserComment>User1</NameUserComment>
+                              <ContentComment>{item.content}</ContentComment>
+                            </RightComment>
+                            <ActionForComment>
+                              <ActionLike>Thích</ActionLike>
+                              <ActionReply
+                                onClick={() => {
+                                  setShowReplyById(item.id);
+                                  setReply({ ...reply, parent_id: item.id });
+                                }}
+                              >
+                                Trả lời
+                              </ActionReply>
+
+                              <TimeReply>{item.created_date}</TimeReply>
+                            </ActionForComment>
+                            {listReplyComment.some(
+                              (itemFilter) => itemFilter.parent_id === item.id
+                            ) && (
+                              <>
+                                <DisplaySubComment
+                                  onClick={() => {
+                                    if (showCommentById === item.id) {
+                                      setShowCommentById(null);
+                                    } else {
+                                      setShowCommentById(item.id);
+                                    }
+                                  }}
+                                >
+                                  <ContentDisplay>
+                                    Hiển thị câu trả lời
+                                  </ContentDisplay>
+                                  <ArrowUpDown active={false} />
+                                </DisplaySubComment>
+                              </>
+                            )}
+                            {showReplyById === item.id && (
+                              <>
+                                <UserCommentWrapper>
+                                  <AvatarUserComment
+                                    src={
+                                      "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg"
+                                    }
+                                  ></AvatarUserComment>
+                                  <InputUserWrapper>
+                                    {" "}
+                                    <InputUserComment
+                                      onChange={(e) => {
+                                        setReply({
+                                          ...reply,
+                                          content: e.target.value,
+                                        });
+                                      }}
+                                      placeholder="Nhập bình luận của bạn..."
+                                    ></InputUserComment>
+                                  </InputUserWrapper>
+                                </UserCommentWrapper>
+                                <ActionCommentWrapper>
+                                  <ButtonComment1 color="#888" bg="white">
+                                    Hủy
+                                  </ButtonComment1>
+                                  <ButtonComment2
+                                    onClick={() => handleButtonReplyComment()}
+                                    mr="25px"
+                                    color="white"
+                                    bg="#ccc"
+                                  >
+                                    Bình luận
+                                  </ButtonComment2>
+                                </ActionCommentWrapper>
+                              </>
+                            )}
+
+                            {/* --- Comment Reply --- */}
+                            {listReplyComment &&
+                              listReplyComment
+                                .filter(
+                                  (itemFilter) =>
+                                    itemFilter.parent_id === item.id
+                                )
+                                .map((itemReply, indexR) => (
+                                  <>
+                                    <SubCommentOfComment
+                                      key={indexR} // Thêm key vào đây
+                                      display={
+                                        showCommentById === item.id
+                                          ? "block"
+                                          : "none"
+                                      }
+                                    >
+                                      <CommentWrapper>
+                                        <LeftComment>
+                                          <UserAvatar
+                                            src={
+                                              "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg"
+                                            }
+                                          ></UserAvatar>
+                                        </LeftComment>
+                                        <RightContentWrapper>
+                                          <RightComment
+                                            onClick={() => console.log("123")}
+                                          >
+                                            <NameUserComment>
+                                              User1
+                                            </NameUserComment>
+                                            <ContentComment>
+                                              {itemReply.content}
+                                            </ContentComment>
+                                          </RightComment>
+                                          <ActionForComment
+                                            onClick={() => handleButtonReply()}
+                                          >
+                                            <ActionLike>Thích ne</ActionLike>
+                                            <ActionReply>Trả lời</ActionReply>
+                                            <TimeReply>20 ngày trước</TimeReply>
+                                          </ActionForComment>
+                                        </RightContentWrapper>
+                                      </CommentWrapper>
+                                    </SubCommentOfComment>
+                                  </>
+                                ))}
+                          </RightContentWrapper>
+                        </CommentWrapper>
+                      </>
+                    );
+                  })}
             </ListAnswerWrapper>
           </QAWrapper>
 
@@ -170,6 +302,7 @@ const ModalCommentWrapper = styled.div`
   height: 100vh;
   top: 0;
   display: flex;
+  overflow: hidden;
   position: absolute;
   justify-content: center;
   align-items: center;
@@ -179,6 +312,7 @@ const ModalCommentWrapper = styled.div`
 const ModalCommentInner = styled.div`
   width: 40%;
   height: 100%;
+  overflow-y: scroll;
 
   background-color: #fff;
 
@@ -362,6 +496,7 @@ const CommentWrapper = styled.div`
   display: flex;
   width: 90%;
   margin: 0 auto;
+  margin-bottom: 15px;
 `;
 const LeftComment = styled.div`
   margin-right: 20px;
@@ -446,17 +581,20 @@ const ActionForComment = styled.div`
   display: flex;
   margin-top: 10px;
   margin-left: 10px;
+  z-index: 2;
 `;
 
 const ActionLike = styled.p`
   margin-right: 12px;
   color: #e87a5a;
   font-size: 13px;
+  cursor: pointer;
 `;
 
 const ActionReply = styled.p`
   color: #e87a5a;
   font-size: 13px;
+  cursor: pointer;
 `;
 const RightContentWrapper = styled.div``;
 
@@ -499,4 +637,7 @@ const ContentDisplay = styled.p`
   margin-right: 8px;
   font-weight: 600;
   cursor: pointer;
+`;
+const ShowReplyWrapper = styled.div`
+  display: flex;
 `;

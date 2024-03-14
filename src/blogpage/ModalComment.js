@@ -6,22 +6,7 @@ import { ArrowLeft, ArrowUpDown, Cancel, Check } from "../based/Icon";
 const ModalComment = ({ isOpen, onSave, onClose }) => {
   const [commentOfUser, setCommentOfUser] = useState("");
   const [showCommentById, setShowCommentById] = useState(null);
-  const [listComment, setListComment] = useState([
-    {
-      id: 1,
-      content: "Bài viết hay",
-      lesson_id: 1,
-      parent_id: null,
-      create_time: "2021-10-10",
-    },
-    {
-      id: 2,
-      lesson_id: 1,
-      parent_id: 2,
-      content: "Bài viết hay",
-      create_time: "2021-10-10",
-    },
-  ]);
+
   console.log("comment", commentOfUser);
 
   const handleButtonComment = () => {
@@ -310,14 +295,6 @@ const IconArrowLeft = styled.div`
 
 const QAWrapper = styled.div`
   width: 100%;
-`;
-
-const AnswerTitle = styled.p``;
-
-const QuestionTitle = styled.p`
-  font-size: 26px;
-  margin-bottom: 20px;
-  text-align: center;
 `;
 
 const ListAnswerWrapper = styled.div`

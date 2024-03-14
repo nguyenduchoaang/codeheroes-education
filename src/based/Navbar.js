@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { Home, Road, Blog, CreateBlog } from "./Icon";
+import { Home, Road, Blog, CreateBlog, Folder, InfoUser } from "./Icon";
 import logoCH2 from "../assets/logocodeheroes.png";
 const MenuExercise = [
   {
@@ -43,6 +43,15 @@ const MenuTask = [
   // },
 ];
 
+const UserTask = [
+  {
+    id: 1,
+    href: "/info-me",
+    icon: InfoUser,
+    title: "Thông tin cá nhân",
+  },
+];
+
 const Navbar = () => {
   return (
     <>
@@ -75,6 +84,24 @@ const Navbar = () => {
               <Title>Tác vụ</Title>
               <MenuWrapper>
                 {MenuTask.map((item, index) => (
+                  <>
+                    <ItemHover>
+                      <Icon>
+                        {" "}
+                        <item.icon active={true} />
+                      </Icon>
+                      <Link to={item.href}>
+                        <ItemMenuLi>{item.title}</ItemMenuLi>
+                      </Link>
+                    </ItemHover>
+                  </>
+                ))}
+              </MenuWrapper>
+            </MenuWrapperParent>
+            <MenuWrapperParent>
+              <Title>Người dùng</Title>
+              <MenuWrapper>
+                {UserTask.map((item, index) => (
                   <>
                     <ItemHover>
                       <Icon>

@@ -1,90 +1,95 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import cookie from "react-cookies";
-import { ArrowLeft, Cancel, Check } from "../based/Icon";
-
-const ModalAnswerQuestion = ({ isOpen, onSave, onClose }) => {
-  const [selectedLoginAccount, setSelectedLoginAccount] = useState(false);
-
-  const [formLogin, setFormLogin] = useState({
-    username: "",
-    password: "",
-  });
+import { ArrowLeft, Cancel, Check, QAIcon } from "../based/Icon";
+import { notify } from "../based/Notification";
+import Notification from "../based/Notification";
+const ModalAnswerQuestion = ({ isOpen, onSave, onClose, dataQuestion }) => {
   const [checkAnswer, setCheckAnswer] = useState(0);
-  const [lessonQuestion, setLessonQuestion] = useState({
-    id: 1,
-    lesson_id: 1,
-    score: 1,
-    content: "Sass là ngôn ngữ gì?",
-  });
+  const [correctAnswer, setCorrectAnswer] = useState(0);
+  const [dataQuestionLesson, setDataQuestionLesson] = useState([]);
+  const [answeredCount, setAnsweredCount] = useState(0);
 
-  const [lessonAnswer, setLessonAnswer] = useState([
-    {
-      id: 1,
-      content: "Ngôn ngữ định kiểu theo tầng",
-      is_correct: 1,
-      question_id: 1,
-    },
-    {
-      id: 2,
-      content: "Ngôn ngữ đánh dấu",
-      is_correct: 0,
-      question_id: 1,
-    },
-    {
-      id: 3,
-      content: "Ngôn ngữ tiền xử lý SCSS",
-      is_correct: 0,
-      question_id: 1,
-    },
-  ]);
+  useEffect(() => {
+    console.log("dataQuestion nek, ", dataQuestion);
+    setDataQuestionLesson(dataQuestion);
+    for (let i = 0; i < dataQuestion.length; i++) {
+      for (let j = 0; j < dataQuestion[i].choices.length; j++) {
+        if (dataQuestion[i].choices[j].is_correct === true) {
+          setCorrectAnswer(dataQuestion[i].choices[j].id);
+        }
+      }
+    }
+  }, [isOpen]);
 
-  console.log(formLogin);
+  const handleCheckAnswer = () => {
+    if (answeredCount >= 3) {
+      notify("warning", "Bạn đã trả lời tối đa 3 câu hỏi!"); // Thông báo khi người dùng đã trả lời tối đa 3 câu hỏi
+      return; // Không thực hiện kiểm tra nếu đã trả lời tối đa
+    }
+
+    if (checkAnswer === correctAnswer) {
+      notify("success", "Câu trả lời đúng!", "", 1000);
+      setTimeout(() => {
+        onSave();
+      }, 1000);
+    } else {
+      notify(
+        "error",
+        `Câu trả lời chưa đúng! bạn còn ${2 - answeredCount} lần trả lời!`
+      );
+    }
+
+    setAnsweredCount((prevCount) => prevCount + 1);
+  };
 
   return (
     <ModalAnswerQuestionWrapper style={{ display: isOpen ? "flex" : "none" }}>
       <ModalAnswerQuestionInner>
+        <Notification />
         <ActionHeader>
           <CancelAction onClick={onClose}>
             {" "}
-            <Cancel />
+            <Cancel active={false} />
           </CancelAction>
         </ActionHeader>
-
         <Header>
-          <IconArrowLeft
-            active={selectedLoginAccount ? true : false}
-            onClick={() => setSelectedLoginAccount(false)}
-          >
-            <ArrowLeft active={true} />
-          </IconArrowLeft>
-          <HeaderTitle></HeaderTitle>
-          <HeaderWarning></HeaderWarning>
+          <QAIconWrapper>
+            {" "}
+            <QAIcon />
+          </QAIconWrapper>
         </Header>
         <Body>
           <QAWrapper>
-            <QuestionTitle>{lessonQuestion.content}</QuestionTitle>
             <ListAnswerWrapper>
-              {lessonAnswer.map((item, index) => {
-                return (
-                  <>
-                    <AnswerItem onClick={() => setCheckAnswer(item.id)}>
-                      <AnswerCheckIcon>
-                        <Check
-                          active={checkAnswer === item.id ? true : false}
-                        />
-                      </AnswerCheckIcon>
-                      <AnswerTitle>{item.content}</AnswerTitle>
-                    </AnswerItem>
-                  </>
-                );
-              })}
+              {dataQuestionLesson &&
+                dataQuestionLesson.map((item, index) => {
+                  return (
+                    <>
+                      <QuestionTitle>{item.content}</QuestionTitle>
+                      {item.choices.map((c, i) => {
+                        return (
+                          <>
+                            <AnswerItem onClick={() => setCheckAnswer(c.id)}>
+                              <AnswerCheckIcon>
+                                <Check
+                                  active={checkAnswer === c.id ? true : false}
+                                />
+                              </AnswerCheckIcon>
+                              <AnswerTitle>{c.content}</AnswerTitle>
+                            </AnswerItem>
+                          </>
+                        );
+                      })}
+                    </>
+                  );
+                })}
             </ListAnswerWrapper>
           </QAWrapper>
 
           <RegisterAccount>
             <TitleRegister></TitleRegister>
-            <ButtonAnswerWrapper onClick={() => onSave(true)}>
+            <ButtonAnswerWrapper onClick={() => handleCheckAnswer()}>
               <ButtonAnswer>Trả lời</ButtonAnswer>
             </ButtonAnswerWrapper>
             {/* <ActionRegister>Đăng ký</ActionRegister> */}
@@ -118,7 +123,7 @@ const ModalAnswerQuestionInner = styled.div`
   width: 540px;
   height: 600px;
   border-radius: 20px;
-  background-color: #fff;
+  background: #191d1e;
 
   position: relative;
 
@@ -197,11 +202,12 @@ const ActionRegister = styled.p`
 `;
 const ItemBottom = styled.div`
   text-align: center;
+  color: #fff;
   font-size: 12px;
   width: 80%;
   margin-top: 20px;
   a {
-    color: red;
+    color: #ff7420;
   }
 `;
 const CancelAction = styled.div`
@@ -252,6 +258,9 @@ const QuestionTitle = styled.p`
   font-size: 26px;
   margin-bottom: 20px;
   text-align: center;
+  width: 80%;
+  margin: 0 auto;
+  color: white;
 `;
 
 const ListAnswerWrapper = styled.div`
@@ -263,12 +272,15 @@ const ListAnswerWrapper = styled.div`
 
 const AnswerItem = styled.div`
   display: flex;
-  border: 1px solid;
   padding: 8px 12px;
   margin: 12px auto;
   width: 90%;
   cursor: pointer;
   border-radius: 12px;
+  background: #323c4a;
+  border: none;
+  align-items: center;
+  color: white;
 `;
 
 const AnswerCheckIcon = styled.div`
@@ -287,4 +299,11 @@ const ButtonAnswer = styled.button`
   &:hover {
     background-color: #f05123;
   }
+`;
+const QAIconWrapper = styled.div`
+  width: 24px;
+  height: 24px;
+  width: 83px;
+  position: absolute;
+  top: -48px;
 `;

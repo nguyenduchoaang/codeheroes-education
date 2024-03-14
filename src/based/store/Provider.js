@@ -11,24 +11,27 @@ function Provider({ children }) {
     getUserInfo();
   }, []);
 
-  const getUserInfo = () => {
+  const getUserInfo = async () => {
     var token = Common.GetToken();
+    console.log("123", decode);
     if (token) {
       var decode = jwtDecode(token);
+      const userName = decode.sub.username;
       console.log("decode", decode);
 
       initState.userInfo = {
-        username: decode.sub,
+        username: userName,
       };
-      //    const [err, data] = await UserServices.GetCourseOfUser();
-      // if (!err && data) {
-      //   initState.courseOfUser = data;
-      // } else {
-      //   console.log(err);
-      // }
+      console.log(decode);
+      const [err, data] = await UserServices.GetCourseOfUser(userName);
+      if (!err && data) {
+        console.log("cousre", data);
+        initState.listCourse = data;
+      } else {
+        console.log(err);
+      }
     }
   };
-
   async function getCourseOfUser() {}
 
   return (

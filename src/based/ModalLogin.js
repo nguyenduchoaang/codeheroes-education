@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import AccountServices from "./services/AccountServices";
 import cookie from "react-cookies";
 import { ArrowLeft } from "./Icon";
+import { jwtDecode } from "jwt-decode";
 const ModalLogin = ({ isOpen, onSave, onClose }) => {
   const [selectedLoginAccount, setSelectedLoginAccount] = useState(false);
   const [formLogin, setFormLogin] = useState({
@@ -17,6 +18,8 @@ const ModalLogin = ({ isOpen, onSave, onClose }) => {
     const [err, data] = await AccountServices.Login(formLogin);
     if (!err && data) {
       cookie.save("token", data.access_token);
+      const userName = jwtDecode(data.access_token).sub.username;
+      cookie.save("username", userName);
       onSave();
       window.location.reload();
     }

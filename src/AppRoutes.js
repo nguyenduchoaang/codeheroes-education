@@ -7,6 +7,7 @@ import Lesson from "./lesson/Lesson";
 import DetailBlog from "./blogpage/DetailBlog";
 import EmptyLayout from "./based/EmptyLayout";
 import CreateBlog from "./blogpage/CreateBlog";
+import InfoMe from "./infome/infome";
 const AppRoutes = [
   {
     path: "/",
@@ -29,7 +30,7 @@ const AppRoutes = [
     layout: DefaultLayout,
   },
   {
-    path: "/lesson/:id",
+    path: "/lessons/:id",
     element: <Lesson />,
     layout: EmptyLayout,
   },
@@ -41,6 +42,11 @@ const AppRoutes = [
   {
     path: "/create-blog",
     element: <CreateBlog />,
+    layout: DefaultLayout,
+  },
+  {
+    path: "/info-me",
+    element: <InfoMe />,
     layout: DefaultLayout,
   },
 ];

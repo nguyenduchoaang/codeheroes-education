@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import ModalComment from "./ModalComment";
 import { useState, useEffect } from "react";
+import cookies from "react-cookies";
 import {
   QAIcon,
   ReplyArrow,
@@ -10,7 +11,33 @@ import {
   Heart,
   BookRule,
 } from "../based/Icon";
+import BlogServices from "../based/services/BlogServices";
+import useStore from "../based/store/useStore";
 const CreateBlog = () => {
+  const [userName, setUserName] = useState("");
+  const [state, dispatch] = useStore();
+  const [formCreateBlog, setFormCreateBlog] = useState({
+    title: "",
+    content: "",
+  });
+
+  console.log("blog", state);
+
+  useEffect(() => {
+    if (state) {
+      setUserName(state.userInfo.username);
+    }
+  }, []);
+
+  const handleCreateBlogServices = async () => {
+    const [err, data] = await BlogServices.CreateBlog(formCreateBlog);
+    if (!err && data) {
+      console.log("data", data);
+    }
+  };
+
+  console.log(formCreateBlog);
+
   return (
     <CreateBlogWrapper>
       <CreateBlogInner>
@@ -19,7 +46,7 @@ const CreateBlog = () => {
             <img src="https://files.fullstack.edu.vn/f8-prod/user_avatars/309573/64af7196d84c6.png"></img>
           </ImgUser>
           <Author>
-            <AuthorBlog>Nguyễn Văn Alexander</AuthorBlog>
+            <AuthorBlog>{userName}</AuthorBlog>
             <TimeBlog>
               <BookRule />
               <p>Quy tắc</p>
@@ -28,7 +55,7 @@ const CreateBlog = () => {
         </SubBlogTitle>
         <CreateBlogHeader>
           <CreateBlogTitle>Tạo bài viết mới</CreateBlogTitle>
-          <CreateBlogAction>
+          <CreateBlogAction onClick={() => handleCreateBlogServices()}>
             <CreateBlogButton>Đăng bài</CreateBlogButton>
           </CreateBlogAction>
         </CreateBlogHeader>
@@ -36,13 +63,26 @@ const CreateBlog = () => {
           <CreateBlogItem>
             <CreateBlogLabel>Tiêu đề</CreateBlogLabel>
             <CreateBlogInput
+              value={formCreateBlog.title}
+              onChange={(e) =>
+                setFormCreateBlog({ ...formCreateBlog, title: e.target.value })
+              }
               type="text"
               placeholder="Nhập tiêu đề"
             ></CreateBlogInput>
           </CreateBlogItem>
           <CreateBlogItem>
             <CreateBlogLabel>Nội dung</CreateBlogLabel>
-            <CreateBlogTextArea placeholder="Nhập nội dung"></CreateBlogTextArea>
+            <CreateBlogTextArea
+              value={formCreateBlog.content}
+              onChange={(e) =>
+                setFormCreateBlog({
+                  ...formCreateBlog,
+                  content: e.target.value,
+                })
+              }
+              placeholder="Nhập nội dung"
+            ></CreateBlogTextArea>
           </CreateBlogItem>
         </CreateBlogBody>
       </CreateBlogInner>
@@ -153,6 +193,7 @@ const Author = styled.div``;
 
 const AuthorBlog = styled.p`
   font-weight: 500;
+  margin-bottom: 5px;
 `;
 const TimeBlog = styled.p`
   color: rgb(117, 117, 117);

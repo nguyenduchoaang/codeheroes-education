@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import ModalComment from "./ModalComment";
 import { useState, useEffect } from "react";
 import {
   QAIcon,
@@ -11,7 +10,7 @@ import {
 } from "../based/Icon";
 import { useParams } from "react-router-dom";
 import BlogServices from "../based/services/BlogServices";
-const DetailBlog = () => {
+const InfoMe = () => {
   const { id } = useParams();
   const [isOpenModalComment, setIsOpenModalComment] = useState(false);
   const [likeBlog, setLikeBlog] = useState(0);
@@ -22,68 +21,6 @@ const DetailBlog = () => {
   });
 
   console.log("123");
-
-  // const [reply, setReply] = useState({
-  //   content: "",
-  //   parent_id: 0,
-  // });
-  // const [listComment, setListComment] = useState([]);
-  // const [listReplyComment, setListReplyComment] = useState([]);
-  // const [showReplyById, setShowReplyById] = useState(null);
-
-  // useEffect(() => {
-  //   setSelectedLesson(lessonsSelected);
-  //   async function fetchData() {
-  //     await handleGetAllCommentOfLesson(lessonsSelected);
-  //   }
-
-  //   fetchData();
-  // }, [isOpen, selectedLesson]);
-
-  // async function handleGetAllCommentOfLesson(id) {
-  //   const [err, data] = await LessonServices.GetAllCommentLesson(id);
-  //   if (!err && data) {
-  //     setListComment(data);
-  //     const listReplyComment = data.filter((item) => item.parent_id !== null);
-  //     setListReplyComment(listReplyComment);
-  //   } else {
-  //     console.log(err);
-  //   }
-  // }
-
-  // async function CommentLesson(id, comment) {
-  //   const [err, data] = await LessonServices.CommentLesson(id, comment);
-  //   if (!err && data) {
-  //     console.log("comment ne", data);
-  //     setComment({ content: "" });
-  //   } else {
-  //     console.log(err);
-  //   }
-  // }
-  // const handleButtonComment = async () => {
-  //   setListComment([...listComment, comment]);
-  //   await CommentLesson(selectedLesson, comment);
-  // };
-
-  // const handleButtonReply = () => {
-  //   console.log("123");
-  // };
-
-  // console.log("rreply", reply);
-
-  // const handleButtonReplyComment = async () => {
-  //   const [err, data] = await LessonServices.CommentLesson(
-  //     selectedLesson,
-  //     reply
-  //   );
-  //   if (!err && data) {
-  //     console.log("comment ne", data);
-  //     setShowReplyById(null);
-  //     handleGetAllCommentOfLesson(selectedLesson);
-  //   } else {
-  //     console.log(err);
-  //   }
-  // };
 
   const handleOpenModalComment = () => {
     setIsOpenModalComment(true);
@@ -113,12 +50,12 @@ const DetailBlog = () => {
   console.log(blogDetail);
 
   return (
-    <DetailBlogWrapper>
-      <DetailBlogLeft>
+    <InfoMeWrapper>
+      <InfoMeLeft>
         <QAIconWrapper>
           <QAIcon></QAIcon>
         </QAIconWrapper>
-        <QATitle>Chia sẻ từ người dùng</QATitle>
+        <QATitle>Thông tin cá nhân</QATitle>
         <User>
           <BlogWrapperHeader>
             {blogDetail && (
@@ -180,110 +117,30 @@ const DetailBlog = () => {
             <SharedBlog></SharedBlog>
           </ActionComment>
         </User>
-      </DetailBlogLeft>
-      <DetailBlogRight>
+      </InfoMeLeft>
+      <InfoMeRight>
         <QAWrapper>
-          <UserCommentWrapper>
-            <AvatarUserComment
-              src={
-                "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg"
-              }
-            ></AvatarUserComment>
-            <InputUserWrapper>
-              {" "}
-              <InputUserComment
-                onChange={(e) => setCommentOfUser(e.target.value)}
-                placeholder="Nhập bình luận của bạn..."
-              ></InputUserComment>
-            </InputUserWrapper>
-          </UserCommentWrapper>
-          <ActionCommentWrapper>
-            <ButtonComment1 color="#888" bg="white">
-              Hủy
-            </ButtonComment1>
-            <ButtonComment2
-              onClick={() => handleButtonComment()}
-              mr="25px"
-              color="white"
-              bg="#ccc"
-            >
-              Bình luận
-            </ButtonComment2>
-          </ActionCommentWrapper>
-          <ListAnswerWrapper>
-            <CommentWrapper>
-              <LeftComment>
-                <UserAvatar
-                  src={
-                    "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg"
-                  }
-                ></UserAvatar>
-              </LeftComment>
-              <RightContentWrapper>
-                <RightComment>
-                  <NameUserComment>User1</NameUserComment>
-                  <ContentComment>
-                    Tôi nghĩ admin không nên trả lời như vậy, rất không hay
-                  </ContentComment>
-                </RightComment>
-                <ActionForComment>
-                  <ActionLike>Thích</ActionLike>
-                  <ActionReply>Trả lời</ActionReply>
-                  <TimeReply>20 ngày trước</TimeReply>
-                </ActionForComment>
-
-                <DisplaySubComment onClick={() => setShowCommentById(1)}>
-                  <ContentDisplay>Hiển thị câu trả lời</ContentDisplay>
-                  <ArrowUpDown active={showCommentById === 1 ? true : false} />
-                </DisplaySubComment>
-                {/* --- Comment Reply --- */}
-                <SubCommentOfComment
-                  display={showCommentById === 1 ? "block" : "none"}
-                >
-                  <CommentWrapper>
-                    <LeftComment>
-                      <UserAvatar
-                        src={
-                          "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg"
-                        }
-                      ></UserAvatar>
-                    </LeftComment>
-                    <RightContentWrapper>
-                      <RightComment2>
-                        <NameUserComment>Người phản biện</NameUserComment>
-                        <ContentComment>Có thiệt ko z</ContentComment>
-                      </RightComment2>
-                      <ActionForComment>
-                        <ActionLike>Thích</ActionLike>
-                        <ActionReply>Trả lời</ActionReply>
-                        <TimeReply>20 ngày trước</TimeReply>
-                      </ActionForComment>
-                    </RightContentWrapper>
-                  </CommentWrapper>
-                </SubCommentOfComment>
-              </RightContentWrapper>
-            </CommentWrapper>
-          </ListAnswerWrapper>
+          <Title>Quản lý bài viết</Title>
         </QAWrapper>
-      </DetailBlogRight>
-    </DetailBlogWrapper>
+      </InfoMeRight>
+    </InfoMeWrapper>
   );
 };
 
-export default DetailBlog;
-const DetailBlogWrapper = styled.div`
+export default InfoMe;
+const InfoMeWrapper = styled.div`
   width: 100%;
   height: 100vh;
   background-color: rgb(241, 241, 241);
   display: flex;
   overflow-x: hidden;
 `;
-const DetailBlogLeft = styled.div`
+const InfoMeLeft = styled.div`
   width: 60%;
   height: 100%;
   padding-left: 20px;
 `;
-const DetailBlogRight = styled.div`
+const InfoMeRight = styled.div`
   width: 40%;
   height: 100%;
   border-left: 1px solid #e0e0e0;
@@ -571,3 +428,4 @@ const RightComment2 = styled.div`
   padding: 9px 12px;
   position: relative;
 `;
+const Title = styled.p``;

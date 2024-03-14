@@ -1,40 +1,55 @@
 import styled from "styled-components";
-
+import { useEffect, useState } from "react";
 import { BookMark, ThreeDot } from "../based/Icon";
 import { Link } from "react-router-dom";
-const listBlog = [
-  {
-    id: 1,
-    title: "Authentication & Authorization trong ReactJS",
-    content:
-      "Authentication và Authorization là một phần quan trọng trong việc phát triển phần mềm, giúp chúng ta xác thực và phân quyền...",
-    createdBy: {
-      id: 1,
-      name: "Nguyễn Văn A",
-      avt: "https://files.fullstack.edu.vn/f8-prod/user_avatars/309573/64af7196d84c6.png",
-    },
-    img: "https://files.fullstack.edu.vn/f8-prod/blog_posts/8306/65299d0ce743e.png",
-    tag: "ReactJs",
-    timeCreated: "4 tháng trước",
-    timeRead: "5 phút đọc",
-  },
-  {
-    id: 1,
-    title: "Authentication & Authorization trong ReactJS",
-    content:
-      "Authentication và Authorization là một phần quan trọng trong việc phát triển phần mềm, giúp chúng ta xác thực và phân quyền...",
-    createdBy: {
-      id: 1,
-      name: "Nguyễn Văn A",
-      avt: "https://files.fullstack.edu.vn/f8-prod/user_avatars/309573/64af7196d84c6.png",
-    },
-    tag: "ReactJs",
-    timeCreated: "4 tháng trước",
-    timeRead: "5 phút đọc",
-  },
-];
+import BlogServices from "../based/services/BlogServices";
+// const listBlog = [
+//   {
+//     id: 1,
+//     title: "Authentication & Authorization trong ReactJS",
+//     content:
+//       "Authentication và Authorization là một phần quan trọng trong việc phát triển phần mềm, giúp chúng ta xác thực và phân quyền...",
+//     createdBy: {
+//       id: 1,
+//       name: "Nguyễn Văn A",
+//       avt: "https://files.fullstack.edu.vn/f8-prod/user_avatars/309573/64af7196d84c6.png",
+//     },
+//     img: "https://files.fullstack.edu.vn/f8-prod/blog_posts/8306/65299d0ce743e.png",
+//     tag: "ReactJs",
+//     timeCreated: "4 tháng trước",
+//     timeRead: "5 phút đọc",
+//   },
+//   {
+//     id: 1,
+//     title: "Authentication & Authorization trong ReactJS",
+//     content:
+//       "Authentication và Authorization là một phần quan trọng trong việc phát triển phần mềm, giúp chúng ta xác thực và phân quyền...",
+//     createdBy: {
+//       id: 1,
+//       name: "Nguyễn Văn A",
+//       avt: "https://files.fullstack.edu.vn/f8-prod/user_avatars/309573/64af7196d84c6.png",
+//     },
+//     tag: "ReactJs",
+//     timeCreated: "4 tháng trước",
+//     timeRead: "5 phút đọc",
+//   },
+// ];
 
 const Blog = () => {
+  const [listBlog, setListBlog] = useState([]);
+
+  useEffect(() => {
+    const fetchBlog = async () => {
+      const [err, data] = await BlogServices.GetAllBlog();
+      if (!err && data) {
+        setListBlog(data);
+      }
+    };
+    fetchBlog();
+  }, []);
+
+  console.log(listBlog);
+
   return (
     <>
       <BlogWrapper>
@@ -65,9 +80,9 @@ const Blog = () => {
                       <HeaderItem>
                         <ActionLeft>
                           <AvtWrapper>
-                            <AvtUser src={item.createdBy.avt}></AvtUser>
+                            <AvtUser></AvtUser>
                           </AvtWrapper>
-                          <NameUser>{item.createdBy.name}</NameUser>
+                          <NameUser></NameUser>
                         </ActionLeft>
                         <ActionRight>
                           <ActionIcon>
@@ -83,13 +98,13 @@ const Blog = () => {
                           <TitleBlog>{item.title}</TitleBlog>
                           <ContentBlog>{item.content}</ContentBlog>
                           <SubItem>
-                            <TagBlog>{item.tag}</TagBlog>
-                            <ContentDetail>{item.timeCreated}</ContentDetail>
-                            <ContentDetail>{item.timeRead}</ContentDetail>
+                            <TagBlog></TagBlog>
+                            <ContentDetail></ContentDetail>
+                            <ContentDetail></ContentDetail>
                           </SubItem>
                         </LeftBodyItem>
                         <RightBodyItem>
-                          <ImgBlog src={item.img}></ImgBlog>
+                          {/* <ImgBlog src={item.img}></ImgBlog> */}
                         </RightBodyItem>
                       </BodyItem>
                     </Item>
@@ -140,7 +155,9 @@ const BlogInner = styled.div`
   margin: 0 auto;
 `;
 
-const LeftItem = styled.div``;
+const LeftItem = styled.div`
+  width: 75%;
+`;
 
 const RightItem = styled.div``;
 

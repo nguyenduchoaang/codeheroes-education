@@ -8,6 +8,7 @@ import ChapterServices from "../based/services/ChapterServices";
 import CourseServices from "../based/services/CousreServices";
 import UserServices from "../based/services/UserServices";
 import Common from "../based/Common";
+import useStore from "../based/store/useStore";
 
 const course_detail = {
   title: "Kiến Thức Nhập Môn IT",
@@ -26,9 +27,31 @@ const course_detail = {
 
 const DetailCourse = () => {
   const { id } = useParams();
+  const [state, dispatch] = useStore();
   const [courseDetails, setCourseDetails] = useState({});
   const [detailsChapter, setDetailsChapter] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState();
+  const [listCourse, setListCourse] = state.listCourse;
+  useEffect(() => {
+    GetCourseOfUserByUserName();
+  }, [id]);
+
+  async function GetCourseOfUserByUserName() {
+    const [err, data] = await UserServices.GetCourseOfUser(
+      state.userInfo.username
+    );
+    if (!err && data) {
+      console.log("cousre by user", data);
+      const find = data.find((d) => d.course_id == id);
+      if (find) {
+        window.location.href = `/lessons/${id}`;
+      }
+    } else {
+      console.log(err);
+    }
+  }
+
+  // console.log("cousre", state);
 
   async function GetDetailsChapterById() {
     const [err, data] = await ChapterServices.GetDetailsChapterById(
@@ -61,6 +84,7 @@ const DetailCourse = () => {
     } else {
       console.log(err);
     }
+    window.location.href = `/lessons/${id}`;
   }
 
   async function HandleEnrollCourse() {
@@ -70,9 +94,6 @@ const DetailCourse = () => {
   useEffect(() => {
     GetcourseDetailsById(id);
   }, [id]);
-
-  console.log("details chapter", detailsChapter);
-  console.log("course details", courseDetails);
 
   return (
     <DetailCourseWrapper>
@@ -165,7 +186,11 @@ const DetailCourse = () => {
           <DCRContent>
             <DCRTitle>Miễn phí</DCRTitle>
 
-            <DCRButton onClick={() => EnrollCourse()}>
+            <DCRButton
+              onClick={() => {
+                EnrollCourse();
+              }}
+            >
               Đăng kí khóa học
             </DCRButton>
           </DCRContent>
