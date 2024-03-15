@@ -169,6 +169,7 @@ class Blog(PostModel):
     def as_dict(self, *attrs) -> dict[str, Any]:
         return {
             **super().as_dict(*attrs),
+            "img_url": self.img_url,
             "user": self.user.as_dict(),
             "tags": self.tags
         }
