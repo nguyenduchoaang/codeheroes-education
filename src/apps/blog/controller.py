@@ -81,7 +81,7 @@ class BlogController:
         parent_id = data.get("parent_id", None)
 
         comment = BlogComment(content=content, parent_id=parent_id,
-                              user_id=identity["id"], lesson_id=blog[0].id,
+                              user_id=identity["id"], blog_id=blog[0].id,
                               create_time=datetime.now())
         db.session.add(comment)
         db.session.commit()

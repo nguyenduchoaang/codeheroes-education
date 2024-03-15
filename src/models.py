@@ -310,7 +310,6 @@ class Lesson(PostModel):
     questions: Mapped[List[Question]] = relationship(backref="lesson", cascade="all, delete")
     user_progress: Mapped[List[Progress]] = relationship(back_populates="lesson")
     comments: Mapped[List[Comment]] = relationship(back_populates="lesson")
-    blog_comments: Mapped[List[BlogComment]] = relationship(back_populates="lesson")
     user_tracking: Mapped[List[ProgressScore]] = relationship(back_populates="lesson")
 
 
