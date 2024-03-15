@@ -162,12 +162,14 @@ class Blog(PostModel):
     img_url: Mapped[Optional[str]] = mapped_column(String(255))
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
+    user: Mapped["User"] = relationship(back_populates="blogs")
     tags: Mapped[List[Tag]] = relationship(secondary=BlogTag, back_populates="blogs")
+    comments: Mapped[List["BlogComment"]] = relationship(back_populates="blog")
 
     def as_dict(self, *attrs) -> dict[str, Any]:
         return {
             **super().as_dict(*attrs),
-            "author_id": self.author_id,
+            "user": self.user.as_dict(),
             "tags": self.tags
         }
 
@@ -182,6 +184,7 @@ class Comment(BaseModel):
     create_time: Mapped[datetime]
 
     user: Mapped["User"] = relationship(back_populates="comments")
+    lesson: Mapped["Lesson"] = relationship(back_populates="comments")
 
     def as_dict(self, *attrs) -> dict[str, Any]:
         data = {
@@ -204,6 +207,7 @@ class BlogComment(BaseModel):
     create_time: Mapped[datetime]
 
     user: Mapped["User"] = relationship(back_populates="blog_comments")
+    blog: Mapped["Blog"] = relationship(back_populates="comments")
 
     def as_dict(self, *attrs) -> dict[str, Any]:
         data = {
@@ -229,7 +233,7 @@ class User(BaseModel):
     phone = Column(String(20))
     role: Mapped[UserRole] = mapped_column(default=UserRole.USER)
 
-    blogs: Mapped[List[Blog]] = relationship(backref="user")
+    blogs: Mapped[List[Blog]] = relationship(back_populates="user")
     courses: Mapped[List[Enrollment]] = relationship(back_populates="user")
     comments: Mapped[List[Comment]] = relationship(back_populates="user")
     blog_comments: Mapped[List[BlogComment]] = relationship(back_populates="user")
@@ -304,7 +308,8 @@ class Lesson(PostModel):
 
     questions: Mapped[List[Question]] = relationship(backref="lesson", cascade="all, delete")
     user_progress: Mapped[List[Progress]] = relationship(back_populates="lesson")
-    comments: Mapped[List[Comment]] = relationship(backref="lesson")
+    comments: Mapped[List[Comment]] = relationship(back_populates="lesson")
+    blog_comments: Mapped[List[BlogComment]] = relationship(back_populates="lesson")
     user_tracking: Mapped[List[ProgressScore]] = relationship(back_populates="lesson")
 
 
