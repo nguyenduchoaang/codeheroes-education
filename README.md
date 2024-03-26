@@ -34,7 +34,15 @@ uv pip install -r requirements.txt
 
 5. Create MySQL schema name `codeheroes`
 
-6. Run `models.py`
+6. Ignore tracking .env file
+
+```
+git update-index --skip-worktree .env
+```
+
+7. Set environment variable in .env file
+
+8. Run `models.py`
 
 ```
 python -m src.models
