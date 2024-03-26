@@ -9,7 +9,7 @@ from src.models import User
 from src.utils.hash import hash_password
 
 
-class AuthController:
+class Controller:
     @staticmethod
     def register():
         data = request.get_json()

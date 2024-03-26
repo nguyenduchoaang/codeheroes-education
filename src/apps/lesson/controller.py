@@ -10,7 +10,7 @@ from src.models import Chapter, Comment, Lesson, Progress, ProgressScore, User
 from src.utils.uuid import bin_to_uuid, uuid_to_bin, is_valid_uuid
 
 
-class LessonController:
+class Controller:
     @staticmethod
     def __add_conditional_statement(stmt, uuid: str):
         if len(uuid) == 36 and is_valid_uuid(uuid):
@@ -24,7 +24,7 @@ class LessonController:
     @staticmethod
     def one(uuid: str):
         try:
-            stmt = LessonController.__add_conditional_statement(select(Lesson), uuid)
+            stmt = Controller.__add_conditional_statement(select(Lesson), uuid)
         except ValueError:
             return jsonify({"message": "Lesson ID is invalid"})
 
@@ -67,7 +67,7 @@ class LessonController:
     @staticmethod
     def update_partial(uuid: str):
         try:
-            stmt = LessonController.__add_conditional_statement(update(Lesson), uuid)
+            stmt = Controller.__add_conditional_statement(update(Lesson), uuid)
         except ValueError:
             return jsonify({"message": "Lesson ID is invalid"})
 
@@ -80,7 +80,7 @@ class LessonController:
     @staticmethod
     def update_all(uuid: str):
         try:
-            stmt = LessonController.__add_conditional_statement(update(Lesson), uuid)
+            stmt = Controller.__add_conditional_statement(update(Lesson), uuid)
         except ValueError:
             return jsonify({"message": "Lesson ID is invalid"})
 
@@ -108,7 +108,7 @@ class LessonController:
     @staticmethod
     def delete(uuid: str):
         try:
-            stmt = LessonController.__add_conditional_statement(delete(Lesson), uuid)
+            stmt = Controller.__add_conditional_statement(delete(Lesson), uuid)
         except ValueError:
             return jsonify({"message": "Lesson ID is invalid"})
 
@@ -148,7 +148,7 @@ class LessonController:
 
         # Add new track on next lesson
         try:
-            stmt = LessonController.__add_conditional_statement(select(Lesson), uuid)
+            stmt = Controller.__add_conditional_statement(select(Lesson), uuid)
         except ValueError:
             return jsonify({"message": "Lesson ID is invalid"})
 
@@ -177,7 +177,7 @@ class LessonController:
     @staticmethod
     def all_comments(uuid: str):
         try:
-            stmt = LessonController.__add_conditional_statement(select(Lesson), uuid)
+            stmt = Controller.__add_conditional_statement(select(Lesson), uuid)
         except ValueError:
             return jsonify({"message": "Lesson ID is invalid"})
 
@@ -191,7 +191,7 @@ class LessonController:
     @jwt_required()
     def create_comment(uuid: str):
         try:
-            stmt = LessonController.__add_conditional_statement(select(Lesson), uuid)
+            stmt = Controller.__add_conditional_statement(select(Lesson), uuid)
         except ValueError:
             return jsonify(msg="Lesson ID is invalid")
 
@@ -243,7 +243,7 @@ class LessonController:
         identity = get_jwt_identity()
 
         try:
-            stmt = LessonController.__add_conditional_statement(select(Lesson), uuid)
+            stmt = Controller.__add_conditional_statement(select(Lesson), uuid)
         except ValueError:
             return jsonify({"message": "Lesson ID is invalid"})
 

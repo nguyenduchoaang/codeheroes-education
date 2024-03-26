@@ -9,7 +9,7 @@ from src.models import Course, Enrollment, Progress, User
 from src.utils.uuid import bin_to_uuid
 
 
-class CourseController:
+class Controller:
     @staticmethod
     def all():
         stmt = select(Course)

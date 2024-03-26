@@ -5,7 +5,7 @@ from src import db
 from src.models import Chapter
 
 
-class ChapterController:
+class Controller:
     @staticmethod
     def one(id: int):
         stmt = select(Chapter).where(Chapter.id == id)

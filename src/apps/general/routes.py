@@ -1,8 +1,8 @@
 from flask import Blueprint
 
-from .controller import GeneralController
+from .controller import Controller
 
-GeneralRouter = Blueprint("general_routes", __name__)
+Router = Blueprint("general_routes", __name__)
 
-GeneralRouter.route("/", methods=["GET"])(GeneralController.home)
-GeneralRouter.route("/upload", methods=["POST"])(GeneralController.upload)
+Router.route("/", methods=["GET"])(Controller.home)
+Router.route("/upload", methods=["POST"])(Controller.upload)

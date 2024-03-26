@@ -6,7 +6,7 @@ from src import db
 from src.models import User
 
 
-class UserController:
+class Controller:
     @staticmethod
     @jwt_required(optional=True)
     def one(username: str):

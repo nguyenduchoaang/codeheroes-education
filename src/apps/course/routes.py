@@ -1,14 +1,14 @@
 from flask import Blueprint
 
-from .controller import CourseController
+from .controller import Controller
 
-CourseRouter = Blueprint("courses_routes", __name__, url_prefix="/courses")
+Router = Blueprint("courses_routes", __name__, url_prefix="/courses")
 
-CourseRouter.route("/", methods=["GET"])(CourseController.all)
-CourseRouter.route("/", methods=["POST"])(CourseController.create)
-CourseRouter.route("/<int:id>/", methods=["GET"])(CourseController.one)
-CourseRouter.route("/<int:id>/", methods=["PUT"])(CourseController.update_all)
-CourseRouter.route("/<int:id>/", methods=["PATCH"])(CourseController.update_partial)
-CourseRouter.route("/<int:id>/", methods=["DELETE"])(CourseController.delete)
-CourseRouter.route("/<int:id>/enroll/", methods=["POST"])(CourseController.enroll)
-CourseRouter.route("/<int:id>/current-lesson/", methods=["GET"])(CourseController.current_lesson)
+Router.route("/", methods=["GET"])(Controller.all)
+Router.route("/", methods=["POST"])(Controller.create)
+Router.route("/<int:id>/", methods=["GET"])(Controller.one)
+Router.route("/<int:id>/", methods=["PUT"])(Controller.update_all)
+Router.route("/<int:id>/", methods=["PATCH"])(Controller.update_partial)
+Router.route("/<int:id>/", methods=["DELETE"])(Controller.delete)
+Router.route("/<int:id>/enroll/", methods=["POST"])(Controller.enroll)
+Router.route("/<int:id>/current-lesson/", methods=["GET"])(Controller.current_lesson)

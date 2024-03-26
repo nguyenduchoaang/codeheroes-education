@@ -8,7 +8,7 @@ from src import db
 from src.models import Blog, BlogComment
 
 
-class BlogController:
+class Controller:
     @staticmethod
     def all():
         rows = db.session.execute(select(Blog)).all()

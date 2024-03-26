@@ -1,11 +1,11 @@
 from flask import Blueprint
 
-from .controller import ChapterController
+from .controller import Controller
 
-ChapterRouter = Blueprint("chapter_routes", __name__, url_prefix="/chapters")
+Router = Blueprint("chapter_routes", __name__, url_prefix="/chapters")
 
-ChapterRouter.route("/", methods=["POST"])(ChapterController.create)
-ChapterRouter.route("/<int:id>/", methods=["GET"])(ChapterController.one)
-ChapterRouter.route("/<int:id>/", methods=["PUT"])(ChapterController.update_all)
-ChapterRouter.route("/<int:id>/", methods=["PATCH"])(ChapterController.update_partial)
-ChapterRouter.route("/<int:id>/", methods=["DELETE"])(ChapterController.delete)
+Router.route("/", methods=["POST"])(Controller.create)
+Router.route("/<int:id>/", methods=["GET"])(Controller.one)
+Router.route("/<int:id>/", methods=["PUT"])(Controller.update_all)
+Router.route("/<int:id>/", methods=["PATCH"])(Controller.update_partial)
+Router.route("/<int:id>/", methods=["DELETE"])(Controller.delete)
